@@ -12,7 +12,7 @@ all: build
 build:
 	@echo "Building the project..."
 	@mkdir -p $(BIN_DIR)
-	$(GOFLAGS) go build -o $(BIN_DIR)/$(BINARY_NAME) -v
+	$(GOFLAGS) go build -C code/ -o ../$(BIN_DIR)/$(BINARY_NAME) -v
 
 # Clean the bin directory
 clean:
