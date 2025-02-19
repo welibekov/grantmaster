@@ -10,8 +10,8 @@ import (
 )
 
 // New creates a new Databaser instance based on the provided configuration.
-func New(config types.Config) (databaser.Databaser, error) {
-	switch types.DatabaseType(config.Database) {
+func New(config map[string]string) (databaser.Databaser, error) {
+	switch types.DatabaseType(config["GM_DATABASE_TYPE"]) {
 	case types.Postgres:
 		// Initialize Postgres database
 		return postgres.New(config)

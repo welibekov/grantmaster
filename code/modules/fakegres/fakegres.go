@@ -11,7 +11,7 @@ type applyFunc func(string, []string) error
 type Fakegres struct{}
 
 // New creates a new instance of Fakegres with the provided configuration.
-func New(config types.Config) (*Fakegres, error) {
+func New(config map[string]string) (*Fakegres, error) {
 	return &Fakegres{}, nil
 }
 

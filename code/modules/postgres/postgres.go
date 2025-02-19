@@ -8,7 +8,7 @@ import (
 
 type Postgres struct{}
 
-func New(config types.Config) (*Postgres, error) {
+func New(config map[string]string) (*Postgres, error) {
 	return &Postgres{}, nil
 }
 
