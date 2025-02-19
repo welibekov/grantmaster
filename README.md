@@ -46,3 +46,8 @@ go install github.com/yourrepo/grantmaster@latest
       roles:
         - write_all
 ```
+
+### Then apply policy like
+```sh
+gm apply --policy policy.yaml
+```
