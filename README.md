@@ -26,4 +26,19 @@
 
 ```sh
 go install github.com/yourrepo/grantmaster@latest
+```
 
+### Example of policy struct
+
+```yaml
+- username: jimmi.hendrix
+  roles:
+    - read_all
+    - write_minimal
+  action: revoke
+- username: david.gilmour
+  roles:
+    - read_all
+    - write_all
+  action: grant
+```
