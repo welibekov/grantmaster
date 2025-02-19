@@ -1,5 +1,7 @@
 # GrantMaster
 
+![GrantMaster Logo](assets/logo.png)
+
 **GrantMaster** is a lightweight, Go-based tool that reads structured YAML/JSON policies and dynamically grants the appropriate database permissions in any database. Designed for efficiency, it leverages existing modules to minimize complexity while ensuring precise and secure access control.
 
 ## Features
