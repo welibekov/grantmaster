@@ -31,7 +31,7 @@ go install github.com/yourrepo/grantmaster@latest
 ### Example of policy struct
 
 ```yaml
-- username: jimmi.hendrix
+- username: jimi.hendrix
   roles:
     - read_all
     - write_minimal
