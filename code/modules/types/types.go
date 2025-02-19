@@ -4,6 +4,6 @@ package types
 type DatabaseType string
 
 var (
-	Postgres DatabaseType // Postgres is a constant for the PostgreSQL database type.
-	Fakegres DatabaseType // Fakegres is a constant for a mocked or fake database type.
+	Postgres DatabaseType = "postgres" // Postgres is a constant for the PostgreSQL database type.
+	Fakegres DatabaseType = "fakegres" // Fakegres is a constant for a mocked or fake database type.
 )

@@ -20,6 +20,6 @@ func New(config map[string]string) (databaser.Databaser, error) {
 		return fakegres.New(config)
 	default:
 		// Return an error if the database type is not recognized
-		return nil, fmt.Errorf("database type could not be found")
+		return nil, fmt.Errorf("database type could not be found: GM_DATABASE_TYPE")
 	}
 }
