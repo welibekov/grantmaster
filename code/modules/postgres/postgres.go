@@ -15,11 +15,3 @@ func New(config map[string]string) (*Postgres, error) {
 func (p *Postgres) Apply([]types.Policy) error {
 	return fmt.Errorf("NYI")
 }
-
-func (p *Postgres) Grant(string, []string) error {
-	return fmt.Errorf("NYI")
-}
-
-func (p *Postgres) Revoke(string, []string) error {
-	return fmt.Errorf("NYI")
-}
