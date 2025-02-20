@@ -25,7 +25,7 @@
 ### Installation
 
 ```sh
-go install github.com/yourrepo/grantmaster@latest
+go install github.com/welibekov/grantmaster@latest
 ```
 
 ### Example of policy struct
