@@ -32,19 +32,12 @@ go install github.com/yourrepo/grantmaster@latest
 
 ```yaml
 - username: david.gilmour
-  actions:
-    - action: grant
-      roles:
-        - write_all
-        - read_all
+  roles:
+    - write_all
 - username: jimi.hendrix
-  actions:
-    - action: grant
-      roles:
-        - readl_all
-    - action: revoke
-      roles:
-        - write_all
+  roles:
+    - readl_all
+    - write_all
 ```
 
 ### Then apply policy like
