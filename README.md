@@ -42,5 +42,7 @@ go install github.com/yourrepo/grantmaster@latest
 
 ### Then apply policy like
 ```sh
+export GM_DATABASE_TYPE=fakegres
+
 gm apply --policy policy.yaml
 ```
