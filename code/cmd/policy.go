@@ -47,5 +47,5 @@ func applyPolicy() error {
 	}
 
 	// Apply policies
-	return databaseInstance.Apply(policies)
+	return databaseInstance.ApplyPolicy(policies)
 }

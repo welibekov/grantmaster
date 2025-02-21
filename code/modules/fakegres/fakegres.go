@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/welibekov/grantmaster/modules/database/base"
 	"github.com/welibekov/grantmaster/modules/types"
 )
 
 type Fakegres struct {
+	*base.Database
+
 	rootDir string // Directory where fakegres data is stored
 }
 
@@ -32,13 +35,14 @@ func New(config map[string]string) (*Fakegres, error) {
 	}
 
 	fakegres.rootDir = rootDir // Set the root directory
+	fakegres.Database = base.NewDatabase()
 
 	return fakegres, nil // Return the initialized Fakegres instance
 }
 
 // Apply processes a slice of policies and applies the specified actions (grant/revoke).
 // It updates the policies map and ensures that any absent policies are removed.
-func (f *Fakegres) Apply(policies []types.Policy) error {
+func (f *Fakegres) ApplyPolicy(policies []types.Policy) error {
 	updatePolicesMap := make(map[string][]string) // Map to keep track of policy updates
 
 	// Loop through each policy to apply it.
@@ -46,7 +50,7 @@ func (f *Fakegres) Apply(policies []types.Policy) error {
 		updatePolicesMap[policy.Username] = policy.Roles // Update the map with the user's roles
 
 		// Apply the individual policy.
-		if err := f.apply(policy); err != nil {
+		if err := f.applyPolicy(policy); err != nil {
 			// Wrap and return the error with context about which policy failed.
 			return fmt.Errorf("failed to apply policy for user %s: %w", policy.Username, err)
 		}
