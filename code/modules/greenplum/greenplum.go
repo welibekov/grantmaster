@@ -1,15 +1,15 @@
-package postgres
+package greenplum
 
 import (
 	"github.com/welibekov/grantmaster/modules/database/base"
 )
 
-type Postgres struct {
+type Greenplum struct {
 	*base.Database
 }
 
-func New(config map[string]string) (*Postgres, error) {
-	return &Postgres{
+func New(config map[string]string) (*Greenplum, error) {
+	return &Greenplum{
 		base.NewDatabase(),
 	}, nil
 
