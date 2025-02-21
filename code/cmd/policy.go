@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -47,5 +48,5 @@ func applyPolicy() error {
 	}
 
 	// Apply policies
-	return databaseInstance.ApplyPolicy(policies)
+	return databaseInstance.ApplyPolicy(context.Background(), policies)
 }

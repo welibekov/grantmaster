@@ -1,6 +1,7 @@
 package fakegres
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -42,7 +43,7 @@ func New(config map[string]string) (*Fakegres, error) {
 
 // Apply processes a slice of policies and applies the specified actions (grant/revoke).
 // It updates the policies map and ensures that any absent policies are removed.
-func (f *Fakegres) ApplyPolicy(policies []types.Policy) error {
+func (f *Fakegres) ApplyPolicy(_ context.Context, policies []types.Policy) error {
 	updatePolicesMap := make(map[string][]string) // Map to keep track of policy updates
 
 	// Loop through each policy to apply it.
