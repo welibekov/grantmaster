@@ -44,6 +44,6 @@ go install github.com/welibekov/grantmaster@latest
 ```sh
 export GM_DATABASE_TYPE=fakegres
 
-gm apply --policy policy.yaml
+gm apply policy --policy policy.yaml
 ```
 
