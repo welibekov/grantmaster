@@ -12,7 +12,7 @@ import (
 )
 
 // apply is a method for the Fakegres struct that accepts a Policy and manages file storage based on that Policy.
-func (f *Fakegres) apply(policy types.Policy) error {
+func (f *Fakegres) applyPolicy(policy types.Policy) error {
 	// Construct the filename based on the Username
 	filename := filepath.Join(f.rootDir, (policy.Username + ".yaml"))
 
