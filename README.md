@@ -46,3 +46,4 @@ export GM_DATABASE_TYPE=fakegres
 
 gm apply --policy policy.yaml
 ```
+
