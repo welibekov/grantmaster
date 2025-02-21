@@ -11,8 +11,8 @@ import (
 	"github.com/welibekov/grantmaster/modules/types"
 )
 
-// ReadPolicies reads policies from the specified path. If the path is a file and is 
-// a YAML file, it reads the policy directly. Otherwise, it attempts to read policies 
+// ReadPolicies reads policies from the specified path. If the path is a file and is
+// a YAML file, it reads the policy directly. Otherwise, it attempts to read policies
 // from all YAML files within a directory.
 func ReadPolicies(policyPath string) ([]types.Policy, error) {
 	if isItFile(policyPath) && isItYAML(policyPath) {
@@ -27,7 +27,7 @@ func ReadPolicies(policyPath string) ([]types.Policy, error) {
 		})
 }
 
-// ReadPoliciesFromDirectory reads policies from all files in a directory using 
+// ReadPoliciesFromDirectory reads policies from all files in a directory using
 // the provided policyFunc to handle each file.
 func ReadPoliciesFromDirectory(policyPath string, policyFunc func(string) ([]types.Policy, error)) ([]types.Policy, error) {
 	return readPoliciesFromDirectory(policyPath, policyFunc)
@@ -43,9 +43,12 @@ func isItYAML(path string) bool {
 	return filepath.Ext(path) == ".yaml" || filepath.Ext(path) == ".yml"
 }
 
-// readPoliciesFromDirectory walks through the specified directory, applying policyFunc to read 
+// readPoliciesFromDirectory walks through the specified directory, applying policyFunc to read
 // each YAML file and collecting the resulting policies.
-func readPoliciesFromDirectory(policyPath string, policyFunc func(string) ([]types.Policy, error)) ([]types.Policy, error) {
+func readPoliciesFromDirectory(
+	policyPath string,
+	policyFunc func(string) ([]types.Policy, error),
+) ([]types.Policy, error) {
 	var policies []types.Policy
 
 	err := filepath.Walk(policyPath, func(path string, info os.FileInfo, err error) error {

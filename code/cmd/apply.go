@@ -38,6 +38,11 @@ func run() error {
 		return fmt.Errorf("couldn't read policies: %v", err)
 	}
 
+	// Detect duplicated policies
+	if err := utils.DetectDuplicated(policies); err != nil {
+		return fmt.Errorf("duplicated policies found: %v", err)
+	}
+
 	// Create an instance of database
 	databaseInstance, err := database.New(config)
 	if err != nil {
