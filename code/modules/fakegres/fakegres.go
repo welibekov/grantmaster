@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/welibekov/grantmaster/modules/database/base"
-	"github.com/welibekov/grantmaster/modules/types"
+	"github.com/welibekov/grantmaster/modules/policy/types"
 )
 
 type Fakegres struct {

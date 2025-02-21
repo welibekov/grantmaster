@@ -3,7 +3,7 @@ package fakegres
 import (
 	"fmt"
 
-	"github.com/welibekov/grantmaster/modules/types"
+	"github.com/welibekov/grantmaster/modules/policy/types"
 	"github.com/welibekov/grantmaster/modules/utils"
 )
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/welibekov/grantmaster/modules/types"
+	"github.com/welibekov/grantmaster/modules/policy/types"
 )
 
 type Database struct{}

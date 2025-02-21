@@ -3,7 +3,7 @@ package databaser
 import (
 	"context"
 
-	"github.com/welibekov/grantmaster/modules/types"
+	"github.com/welibekov/grantmaster/modules/policy/types"
 )
 
 // Databaser defines methods for managing policies and permissions.

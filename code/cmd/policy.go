@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/welibekov/grantmaster/modules/config"
 	"github.com/welibekov/grantmaster/modules/database"
+	"github.com/welibekov/grantmaster/modules/policy"
 	"github.com/welibekov/grantmaster/modules/utils"
 )
 
@@ -37,7 +38,7 @@ func applyPolicy() error {
 	}
 
 	// Detect duplicated policies
-	if err := utils.DetectDuplicated(policies); err != nil {
+	if err := policy.DetectDuplicated(policies); err != nil {
 		return fmt.Errorf("duplicated policies found: %v", err)
 	}
 

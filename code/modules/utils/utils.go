@@ -5,10 +5,10 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 
-	"github.com/sirupsen/logrus"
-	"github.com/welibekov/grantmaster/modules/types"
+	"github.com/welibekov/grantmaster/modules/policy/types"
 )
 
 // ReadPolicies reads policies from the specified path. If the path is a file and is

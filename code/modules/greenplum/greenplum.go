@@ -6,7 +6,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"                        // Importing the pgxpool package for PostgreSQL connection pooling
 	"github.com/welibekov/grantmaster/modules/database/base" // Importing base database module
-	"github.com/welibekov/grantmaster/modules/types"         // Importing types module for policy definitions
+	"github.com/welibekov/grantmaster/modules/policy/types"  // Importing types module for policy definitions
 )
 
 // Greenplum struct represents a connection to a Greenplum database.
