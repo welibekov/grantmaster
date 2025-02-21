@@ -2,14 +2,12 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/welibekov/grantmaster/modules/database"
-	"github.com/welibekov/grantmaster/modules/types"
-	"gopkg.in/yaml.v3"
+	"github.com/welibekov/grantmaster/modules/utils"
 )
 
 var policyFile string
@@ -34,15 +32,10 @@ func run() error {
 	// Load configuration from environment variables
 	config := loadConfig()
 
-	// Read policy YAML file
-	data, err := ioutil.ReadFile(policyFile)
+	// Read policies from file or directory.
+	policies, err := utils.ReadPolicies(policyFile)
 	if err != nil {
-		return fmt.Errorf("failed to read policy file: %w", err)
-	}
-
-	var policies []types.Policy
-	if err := yaml.Unmarshal(data, &policies); err != nil {
-		return fmt.Errorf("failed to unmarshal YAML: %w", err)
+		return fmt.Errorf("couldn't read policies: %v", err)
 	}
 
 	// Create an instance of database
