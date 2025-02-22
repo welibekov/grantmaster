@@ -6,8 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var policyFile string
-
 func init() {
 	rootCmd.AddCommand(gmApplyCmd)
 }

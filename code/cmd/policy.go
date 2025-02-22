@@ -10,6 +10,8 @@ import (
 	"github.com/welibekov/grantmaster/modules/policy"
 )
 
+var policyFile string
+
 func init() {
 	gmApplyCmd.AddCommand(gmApplyPolicyCmd)
 	gmApplyPolicyCmd.Flags().StringVar(&policyFile, "policy", "", "Path to policy YAML file (mandatory)")
