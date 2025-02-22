@@ -3,10 +3,9 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"gopkg.in/yaml.v3"
+	"github.com/sirupsen/logrus"
 
 	"github.com/welibekov/grantmaster/modules/database/base"
 	"github.com/welibekov/grantmaster/modules/policy"
@@ -44,20 +43,26 @@ func (p *Postgres) ApplyPolicy(ctx context.Context, policies []types.Policy) err
 	}
 	defer pool.Close() // Ensure that the connection pool is closed when the function exits
 
+	// Assign the newly created pool to the Postgres struct
+	p.pool = pool
+
+	// Retrieve existing policies from the database
 	exisitingPolicies, err := pgPolicy.GetExisting(ctx, pool)
 	if err != nil {
 		return fmt.Errorf("couldn't apply policies: %v", err)
 	}
 
-	applyPolicy := policy.Compare(policies, exisitingPolicies)
+	// Determine which policies need to be revoked based on the current and new policies
+	revokePolicies := policy.WhatToRevoke(policies, exisitingPolicies)
 
-	yamlBytes, err := yaml.Marshal(applyPolicy)
-	if err != nil {
-		return fmt.Errorf("couldn't marshal yaml: %v")
+	// Log the length of policies to be revoked for debugging purposes
+	logrus.Debugln("Revoke policies length=", len(revokePolicies))
+
+	// Revoke the identified policies from the database
+	if err := p.revokePolicy(ctx, revokePolicies); err != nil {
+		return fmt.Errorf("couldn't revoke policies: %v", err)
 	}
 
-	os.Stdout.Write(yamlBytes)
-
-	// This indicates that the implementation of the ApplyPolicy method is not yet complete
-	return fmt.Errorf("NYI") // NYI: Not Yet Implemented
+	// Grant the new policies to the database
+	return p.grantPolicy(ctx, policies)
 }
