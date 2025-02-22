@@ -8,7 +8,6 @@ import (
 	"github.com/welibekov/grantmaster/modules/config"
 	"github.com/welibekov/grantmaster/modules/database"
 	"github.com/welibekov/grantmaster/modules/policy"
-	"github.com/welibekov/grantmaster/modules/utils"
 )
 
 func init() {
@@ -32,7 +31,7 @@ func applyPolicy() error {
 	config := config.Load()
 
 	// Read policies from file or directory.
-	policies, err := utils.ReadPolicies(policyFile)
+	policies, err := policy.ReadPolicies(policyFile)
 	if err != nil {
 		return fmt.Errorf("couldn't read policies: %v", err)
 	}
