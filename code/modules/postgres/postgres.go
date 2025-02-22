@@ -63,6 +63,9 @@ func (p *Postgres) ApplyPolicy(ctx context.Context, policies []types.Policy) err
 		return fmt.Errorf("couldn't revoke policies: %v", err)
 	}
 
+	// Determine which policies need to be granted based on the current and new policies
+	grantPolicies := policy.WhatToGrant(policies, exisitingPolicies)
+
 	// Grant the new policies to the database
-	return p.grantPolicy(ctx, policies)
+	return p.grantPolicy(ctx, grantPolicies)
 }
