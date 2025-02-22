@@ -7,8 +7,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/welibekov/grantmaster/modules/types"
 	"gopkg.in/yaml.v3"
+
+	"github.com/welibekov/grantmaster/modules/policy/types"
 )
 
 // apply is a method for the Fakegres struct that accepts a Policy and manages file storage based on that Policy.

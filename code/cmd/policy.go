@@ -1,12 +1,13 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/spf13/cobra"
 	"github.com/welibekov/grantmaster/modules/config"
 	"github.com/welibekov/grantmaster/modules/database"
-	"github.com/welibekov/grantmaster/modules/utils"
+	"github.com/welibekov/grantmaster/modules/policy"
 )
 
 func init() {
@@ -30,13 +31,13 @@ func applyPolicy() error {
 	config := config.Load()
 
 	// Read policies from file or directory.
-	policies, err := utils.ReadPolicies(policyFile)
+	policies, err := policy.ReadPolicies(policyFile)
 	if err != nil {
 		return fmt.Errorf("couldn't read policies: %v", err)
 	}
 
 	// Detect duplicated policies
-	if err := utils.DetectDuplicated(policies); err != nil {
+	if err := policy.DetectDuplicated(policies); err != nil {
 		return fmt.Errorf("duplicated policies found: %v", err)
 	}
 
@@ -47,5 +48,5 @@ func applyPolicy() error {
 	}
 
 	// Apply policies
-	return databaseInstance.ApplyPolicy(policies)
+	return databaseInstance.ApplyPolicy(context.Background(), policies)
 }

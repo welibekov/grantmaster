@@ -1,9 +1,9 @@
-package utils
+package policy
 
 import (
 	"fmt"
 
-	"github.com/welibekov/grantmaster/modules/types"
+	"github.com/welibekov/grantmaster/modules/policy/types"
 )
 
 // DetectDuplicated checks for duplicate policies based on the username.
