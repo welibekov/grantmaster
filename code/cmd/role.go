@@ -1,15 +1,21 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/welibekov/grantmaster/modules/assets"
+	"github.com/welibekov/grantmaster/modules/config"
+	"github.com/welibekov/grantmaster/modules/database"
+	"github.com/welibekov/grantmaster/modules/role/types"
 )
+
+var roleFile string
 
 func init() {
 	gmApplyCmd.AddCommand(gmApplyRoleCmd)
-	gmApplyRoleCmd.Flags().StringVar(&policyFile, "policy", "", "Path to role YAML file or directory (mandatory)")
+	gmApplyRoleCmd.Flags().StringVar(&roleFile, "role", "", "Path to role YAML file or directory (mandatory)")
 	gmApplyRoleCmd.MarkFlagRequired("role")
 }
 
@@ -17,7 +23,33 @@ var gmApplyRoleCmd = &cobra.Command{
 	Use:   "role",
 	Short: "Apply roles from the specified YAML file or directory",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("NYI")
-		os.Exit(1)
+		if err := applyRole(); err != nil {
+			fmt.Println("Error:", err)
+		}
 	},
+}
+
+func applyRole() error {
+	// Load configuration from environment variables
+	config := config.Load()
+
+	// Read roles from file or directory.
+	roles, err := assets.ReadAssets[types.Role](roleFile)
+	if err != nil {
+		return fmt.Errorf("couldn't read roles: %v", err)
+	}
+
+	// Detect duplicated roles
+	if err := assets.DetectDuplicated[types.Role](roles, func(r types.Role) string { return r.Name }); err != nil {
+		return fmt.Errorf("duplicated roles found: %v", err)
+	}
+
+	// Create an instance of database
+	databaseInstance, err := database.New(config)
+	if err != nil {
+		return fmt.Errorf("failed to create database instance: %w", err)
+	}
+
+	// Apply roles
+	return databaseInstance.ApplyRole(context.Background(), roles)
 }
