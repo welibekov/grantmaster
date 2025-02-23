@@ -8,7 +8,6 @@ import (
 	"github.com/welibekov/grantmaster/modules/assets"
 	"github.com/welibekov/grantmaster/modules/config"
 	"github.com/welibekov/grantmaster/modules/database"
-	"github.com/welibekov/grantmaster/modules/policy"
 	"github.com/welibekov/grantmaster/modules/policy/types"
 )
 
@@ -41,7 +40,7 @@ func applyPolicy() error {
 	}
 
 	// Detect duplicated policies
-	if err := policy.DetectDuplicated(policies); err != nil {
+	if err := assets.DetectDuplicated[types.Policy](policies, func(r types.Policy) string { return r.Username }); err != nil {
 		return fmt.Errorf("duplicated policies found: %v", err)
 	}
 

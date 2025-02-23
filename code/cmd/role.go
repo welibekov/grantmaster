@@ -1,9 +1,14 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/welibekov/grantmaster/modules/assets"
+	"github.com/welibekov/grantmaster/modules/config"
+	"github.com/welibekov/grantmaster/modules/database"
+	"github.com/welibekov/grantmaster/modules/role/types"
 )
 
 var roleFile string
@@ -26,7 +31,25 @@ var gmApplyRoleCmd = &cobra.Command{
 
 func applyRole() error {
 	// Load configuration from environment variables
-	// config := config.Load()
+	config := config.Load()
 
-	return fmt.Errorf("NYI")
+	// Read roles from file or directory.
+	roles, err := assets.ReadAssets[types.Role](roleFile)
+	if err != nil {
+		return fmt.Errorf("couldn't read roles: %v", err)
+	}
+
+	// Detect duplicated roles
+	if err := assets.DetectDuplicated[types.Role](roles, func(r types.Role) string { return r.Name }); err != nil {
+		return fmt.Errorf("duplicated roles found: %v", err)
+	}
+
+	// Create an instance of database
+	databaseInstance, err := database.New(config)
+	if err != nil {
+		return fmt.Errorf("failed to create database instance: %w", err)
+	}
+
+	// Apply roles
+	return databaseInstance.ApplyRole(context.Background(), roles)
 }

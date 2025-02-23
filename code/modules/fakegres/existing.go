@@ -4,18 +4,15 @@ import (
 	"fmt"
 
 	"github.com/welibekov/grantmaster/modules/assets"
-	"github.com/welibekov/grantmaster/modules/policy/types"
 )
 
-// readExistingPolicies reads all YAML files in the specified directory and unmarshals them into Policy structs.
-func (f *Fakegres) readExistingPolicies() (map[string][]string, error) {
-	policiesMap := make(map[string][]string)
+// readExisting reads all YAML files in the specified directory and unmarshals them into generic structs.
+func readExisting[T any](rootDir string, toMap func(data []T) map[string][]string) (map[string][]string, error) {
+	policies, err := assets.ReadAssetsFromDirectory(rootDir,
+		func(path string) ([]T, error) {
+			policies := []T{}
 
-	policies, err := assets.ReadAssetsFromDirectory(f.rootDir,
-		func(path string) ([]types.Policy, error) {
-			policies := []types.Policy{}
-
-			policy, err := assets.ReadAsset[types.Policy](path)
+			policy, err := assets.ReadAsset[T](path)
 			if err != nil {
 				return policies, err
 			}
@@ -24,12 +21,8 @@ func (f *Fakegres) readExistingPolicies() (map[string][]string, error) {
 		})
 
 	if err != nil {
-		return nil, fmt.Errorf("error walking the path %q: %w", f.rootDir, err)
+		return nil, fmt.Errorf("error walking the path %q: %w", rootDir, err)
 	}
 
-	for _, policy := range policies {
-		policiesMap[policy.Username] = policy.Roles
-	}
-
-	return policiesMap, nil
+	return toMap(policies), nil
 }
