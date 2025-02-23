@@ -5,9 +5,11 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/welibekov/grantmaster/modules/assets"
 	"github.com/welibekov/grantmaster/modules/config"
 	"github.com/welibekov/grantmaster/modules/database"
 	"github.com/welibekov/grantmaster/modules/policy"
+	"github.com/welibekov/grantmaster/modules/policy/types"
 )
 
 var policyFile string
@@ -33,7 +35,7 @@ func applyPolicy() error {
 	config := config.Load()
 
 	// Read policies from file or directory.
-	policies, err := policy.ReadPolicies(policyFile)
+	policies, err := assets.ReadAssets[types.Policy](policyFile)
 	if err != nil {
 		return fmt.Errorf("couldn't read policies: %v", err)
 	}

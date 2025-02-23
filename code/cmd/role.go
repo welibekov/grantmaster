@@ -25,5 +25,8 @@ var gmApplyRoleCmd = &cobra.Command{
 }
 
 func applyRole() error {
+	// Load configuration from environment variables
+	// config := config.Load()
+
 	return fmt.Errorf("NYI")
 }
