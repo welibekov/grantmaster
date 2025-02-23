@@ -1,4 +1,4 @@
-package postgres
+package policy
 
 import (
 	"context"
@@ -9,9 +9,9 @@ import (
 	"github.com/welibekov/grantmaster/modules/policy/types"
 )
 
-// revokePolicy revokes specified roles from a user based on the provided policies.
+// Revoke revokes specified roles from a user based on the provided policies.
 // It takes a context and a slice of policies as input and returns an error if any issues occur during execution.
-func (p *Postgres) revokePolicy(ctx context.Context, policies []types.Policy) error {
+func (p *PGPolicy) Revoke(ctx context.Context, policies []types.Policy) error {
 	// Iterate through each policy to revoke roles from the corresponding user
 	for _, policy := range policies {
 		// Generate the SQL revoke query for the current policy
@@ -33,7 +33,7 @@ func (p *Postgres) revokePolicy(ctx context.Context, policies []types.Policy) er
 
 // revokeQuery constructs a SQL REVOKE statement for the given policy,
 // which specifies roles to be revoked from a specific user.
-func (p *Postgres) revokeQuery(policy types.Policy) string {
+func (p *PGPolicy) revokeQuery(policy types.Policy) string {
 	// Join the roles with commas and format the SQL query string
 	return fmt.Sprintf(`REVOKE "%s" FROM "%s"`, strings.Join(policy.Roles, ","), policy.Username)
 }

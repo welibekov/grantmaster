@@ -1,4 +1,4 @@
-package postgres
+package policy
 
 import (
 	"context"
@@ -9,8 +9,8 @@ import (
 	"github.com/welibekov/grantmaster/modules/policy/types"
 )
 
-// grantPolicy takes a context and a slice of policies, and attempts to grant specified roles to users
-func (p *Postgres) grantPolicy(ctx context.Context, policies []types.Policy) error {
+// Grant takes a context and a slice of policies, and attempts to grant specified roles to users
+func (p *PGPolicy) Grant(ctx context.Context, policies []types.Policy) error {
 	// Iterate over each policy in the provided slice
 	for _, policy := range policies {
 		// Generate the SQL grant query based on the current policy
@@ -35,7 +35,7 @@ func (p *Postgres) grantPolicy(ctx context.Context, policies []types.Policy) err
 }
 
 // grantQuery constructs the SQL query string for granting roles to a user
-func (p *Postgres) grantQuery(policy types.Policy) string {
+func (p *PGPolicy) grantQuery(policy types.Policy) string {
 	// Join the roles with a comma and format the SQL grant statement
 	return fmt.Sprintf(`GRANT %s TO %s;`, strings.Join(policy.Roles, ","), policy.Username)
 }
