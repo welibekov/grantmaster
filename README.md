@@ -36,7 +36,7 @@ go install github.com/welibekov/grantmaster@latest
     - write_all
 - username: jimi.hendrix
   roles:
-    - readl_all
+    - read_all
     - write_all
 ```
 
@@ -45,5 +45,22 @@ go install github.com/welibekov/grantmaster@latest
 export GM_DATABASE_TYPE=fakegres
 
 gm apply policy --policy policy.yaml
+```
+
+### Example of role struct
+
+```yaml
+- name: song_write
+  schema: song
+
+- name: song_read
+  schema: song
+```
+
+### Then apply role like
+```sh
+export GM_DATABASE_TYPE=fakegres
+
+gm apply role --role role.yaml
 ```
 
