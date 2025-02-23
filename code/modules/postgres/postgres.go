@@ -21,9 +21,9 @@ type Postgres struct {
 
 func New(config map[string]string) (*Postgres, error) {
 	// Retrieve the connection string from the configuration map
-	connString, found := config["GM_POSTGRES_CONN_STRING"]
+	connString, found := config[pgConnectionString]
 	if !found {
-		return nil, fmt.Errorf("GM_POSTGRES_CONN_STRING not defined") // Return an error if not found
+		return nil, fmt.Errorf("%s not defined", pgConnectionString) // Return an error if not found
 	}
 
 	// Return a new Postgres instance with the initialized database and connection string
