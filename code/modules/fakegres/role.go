@@ -18,7 +18,7 @@ func (f *Fakegres) ApplyRole(_ context.Context, roles []types.Role) error {
 		updateRolesMap[role.Name] = []string{} // Update the map
 
 		// Apply the individual role.
-		if err := apply(role, f.absPath(f.roleDir, role.Name)); err != nil {
+		if err := apply(role, f.absPathRole(f.roleDir, role.Name)); err != nil {
 			// Wrap and return the error with context about which role failed.
 			return fmt.Errorf("failed to apply role for user %s: %w", role.Name, err)
 		}
@@ -58,7 +58,7 @@ func (f *Fakegres) removeAbsentRoles(updateRolesMap map[string][]string) error {
 		_, found := updateRolesMap[name]
 		if !found {
 			// If the username is not found in the update map, proceed to remove the role.
-			if err := os.Remove(f.absPath(f.roleDir, name)); err != nil {
+			if err := os.Remove(f.absPathRole(f.roleDir, name)); err != nil {
 				// Wrap the error with additional context before returning.
 				return fmt.Errorf("failed to remove role '%s': %w", name, err)
 			}
