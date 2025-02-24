@@ -34,6 +34,13 @@ func (p *PGPolicy) Revoke(ctx context.Context, policies []types.Policy) error {
 // revokeQuery constructs a SQL REVOKE statement for the given policy,
 // which specifies roles to be revoked from a specific user.
 func (p *PGPolicy) revokeQuery(policy types.Policy) string {
+	// Wrap roles with double quotes
+	roles := make([]string, 0, len(policy.Roles))
+
+	for _, role := range policy.Roles {
+		roles = append(roles, fmt.Sprintf(`"%s"`, role))
+	}
+
 	// Join the roles with commas and format the SQL query string
-	return fmt.Sprintf(`REVOKE "%s" FROM "%s"`, strings.Join(policy.Roles, ","), policy.Username)
+	return fmt.Sprintf(`REVOKE %s FROM "%s"`, strings.Join(roles, ","), policy.Username)
 }
