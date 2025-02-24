@@ -4,12 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/welibekov/grantmaster/modules/policy/types"
 )
 
 // GetExisting retrieves existing policies from the database.
-func GetExisting(ctx context.Context, pool *pgxpool.Pool) ([]types.Policy, error) {
+func (p *PGPolicy) GetExisting(ctx context.Context) ([]types.Policy, error) {
 	// Map to hold roles associated with each username.
 	rolesMap := make(map[string][]string)
 
@@ -28,7 +27,7 @@ JOIN pg_roles r
 ON m.roleid = r.oid;`
 
 	// Execute the query.
-	rows, err := pool.Query(ctx, query)
+	rows, err := p.pool.Query(ctx, query)
 	if err != nil {
 		// Wrap the error to include context about where it occurred.
 		return policies, fmt.Errorf("failed to execute query to get policies: %w", err)

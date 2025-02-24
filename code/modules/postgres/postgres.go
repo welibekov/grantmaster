@@ -5,10 +5,8 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/sirupsen/logrus"
 
 	"github.com/welibekov/grantmaster/modules/database/base"
-	"github.com/welibekov/grantmaster/modules/policy"
 	"github.com/welibekov/grantmaster/modules/policy/types"
 	pgPolicy "github.com/welibekov/grantmaster/modules/postgres/policy"
 )
@@ -21,9 +19,9 @@ type Postgres struct {
 
 func New(config map[string]string) (*Postgres, error) {
 	// Retrieve the connection string from the configuration map
-	connString, found := config["GM_POSTGRES_CONN_STRING"]
+	connString, found := config[pgConnectionString]
 	if !found {
-		return nil, fmt.Errorf("GM_POSTGRES_CONN_STRING not defined") // Return an error if not found
+		return nil, fmt.Errorf("%s not defined", pgConnectionString) // Return an error if not found
 	}
 
 	// Return a new Postgres instance with the initialized database and connection string
@@ -43,29 +41,9 @@ func (p *Postgres) ApplyPolicy(ctx context.Context, policies []types.Policy) err
 	}
 	defer pool.Close() // Ensure that the connection pool is closed when the function exits
 
-	// Assign the newly created pool to the Postgres struct
-	p.pool = pool
+	// Assign the newly created pool to the PGPolicy struct
+	pgpol := pgPolicy.New(pool)
 
-	// Retrieve existing policies from the database
-	exisitingPolicies, err := pgPolicy.GetExisting(ctx, pool)
-	if err != nil {
-		return fmt.Errorf("couldn't apply policies: %v", err)
-	}
-
-	// Determine which policies need to be revoked based on the current and new policies
-	revokePolicies := policy.WhatToRevoke(policies, exisitingPolicies)
-
-	// Log the length of policies to be revoked for debugging purposes
-	logrus.Debugln("Revoke policies length=", len(revokePolicies))
-
-	// Revoke the identified policies from the database
-	if err := p.revokePolicy(ctx, revokePolicies); err != nil {
-		return fmt.Errorf("couldn't revoke policies: %v", err)
-	}
-
-	// Determine which policies need to be granted based on the current and new policies
-	grantPolicies := policy.WhatToGrant(policies, exisitingPolicies)
-
-	// Grant the new policies to the database
-	return p.grantPolicy(ctx, grantPolicies)
+	// Apply policies to Postgres database
+	return pgpol.Apply(ctx, policies)
 }
