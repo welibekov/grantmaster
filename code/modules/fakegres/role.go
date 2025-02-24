@@ -15,7 +15,7 @@ func (f *Fakegres) ApplyRole(_ context.Context, roles []types.Role) error {
 
 	// Loop through each role to apply it.
 	for _, role := range roles {
-		updateRolesMap[role.Name] = []string{role.Type} // Update the map with type
+		updateRolesMap[role.Name] = []string{} // Update the map
 
 		// Apply the individual role.
 		if err := apply(role, f.absPath(f.roleDir, role.Name)); err != nil {
@@ -42,7 +42,7 @@ func (f *Fakegres) removeAbsentRoles(updateRolesMap map[string][]string) error {
 		func(roles []types.Role) map[string][]string {
 			rolesMap := make(map[string][]string)
 			for _, role := range roles {
-				rolesMap[role.Name] = []string{role.Type}
+				rolesMap[role.Name] = []string{}
 			}
 
 			return rolesMap
