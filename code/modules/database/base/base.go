@@ -8,10 +8,14 @@ import (
 	rolTypes "github.com/welibekov/grantmaster/modules/role/types"
 )
 
-type Database struct{}
+type Database struct {
+	RolePrefix string
+}
 
-func NewDatabase() *Database {
-	return &Database{}
+func NewDatabase(config map[string]string) *Database {
+	return &Database{
+		RolePrefix: config["GM_DATABASE_ROLE_PREFIX"], // Role filename prefix from the configuration.
+	}
 }
 
 func (d *Database) ApplyPolicy(context.Context, []polTypes.Policy) error {

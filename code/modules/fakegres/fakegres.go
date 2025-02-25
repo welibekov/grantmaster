@@ -13,10 +13,9 @@ import (
 type Fakegres struct {
 	*base.Database // Embedding the base database type for database functionality.
 
-	rootDir    string // Directory where fakegres data is stored
-	roleDir    string // Directory where role files are stored
-	policyDir  string // Directory where policy files are stored
-	rolePrefix string // Prefix to be applied to role filenames
+	rootDir   string // Directory where fakegres data is stored
+	roleDir   string // Directory where role files are stored
+	policyDir string // Directory where policy files are stored
 }
 
 // New creates a new instance of Fakegres with the provided configuration.
@@ -30,9 +29,8 @@ func New(config map[string]string) (*Fakegres, error) {
 
 	// Initialize a Fakegres instance with the appropriate directory paths.
 	fakegres := &Fakegres{
-		roleDir:    filepath.Join(rootDir, "role"),    // Full path to the role directory.
-		policyDir:  filepath.Join(rootDir, "policy"),  // Full path to the policy directory.
-		rolePrefix: config["GM_DATABASE_ROLE_PREFIX"],  // Role filename prefix from the configuration.
+		roleDir:   filepath.Join(rootDir, "role"),   // Full path to the role directory.
+		policyDir: filepath.Join(rootDir, "policy"), // Full path to the policy directory.
 	}
 
 	// Check if the specified root directory exists and create necessary subdirectories.
@@ -46,8 +44,8 @@ func New(config map[string]string) (*Fakegres, error) {
 		}
 	}
 
-	fakegres.rootDir = rootDir // Set the root directory for the Fakegres instance.
-	fakegres.Database = base.NewDatabase() // Initialize the embedded base database.
+	fakegres.rootDir = rootDir                   // Set the root directory for the Fakegres instance.
+	fakegres.Database = base.NewDatabase(config) // Initialize the embedded base database.
 
 	return fakegres, nil // Return the initialized Fakegres instance.
 }
@@ -79,6 +77,6 @@ func (f *Fakegres) absPathRole(path ...string) string {
 	// Get the directory of the absolute path.
 	directory := filepath.Dir(absPath)
 
-	// Combine the directory and the filename prefixed with rolePrefix to form the final path.
-	return filepath.Join(directory, f.rolePrefix+filename)
+	// Combine the directory and the filename prefixed with RolePrefix to form the final path.
+	return filepath.Join(directory, f.RolePrefix+filename)
 }
