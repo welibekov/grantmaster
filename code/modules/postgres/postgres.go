@@ -44,7 +44,7 @@ func (p *Postgres) ApplyPolicy(ctx context.Context, policies []polTypes.Policy) 
 	defer pool.Close() // Ensure that the connection pool is closed when the function exits
 
 	// Assign the newly created pool to the PGPolicy struct
-	pgpol := pgPolicy.New(pool)
+	pgpol := pgPolicy.New(pool, p.RolePrefix)
 
 	// Apply policies to Postgres database
 	return pgpol.Apply(ctx, policies)
