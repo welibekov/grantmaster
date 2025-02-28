@@ -3,6 +3,7 @@ package role
 import (
 	"context"
 
+	"github.com/sirupsen/logrus"
 	"github.com/welibekov/grantmaster/modules/role"
 	"github.com/welibekov/grantmaster/modules/role/types"
 )
@@ -15,8 +16,13 @@ func (p *PGRole) Apply(ctx context.Context, roles []types.Role) error {
 		return err
 	}
 
+	logrus.Debugln(existingRoles) // Log the generated query for debugging purposes
+
 	createRoles := role.WhatToCreate(roles, existingRoles)
 	removeRoles := role.WhatToRemove(roles, existingRoles)
+
+	logrus.Debugln(createRoles) // Log the generated query for debugging purposes
+	logrus.Debugln(removeRoles) // Log the generated query for debugging purposes
 
 	if len(createRoles) > 0 {
 		if err := p.Create(ctx, createRoles); err != nil {

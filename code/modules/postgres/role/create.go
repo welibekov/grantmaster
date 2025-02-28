@@ -19,7 +19,7 @@ func (p *PGRole) Create(ctx context.Context, roles []types.Role) error {
 		_, err := p.pool.Exec(ctx, query)
 		if err != nil {
 			// Wrap the error with more context to help identify the issue if it occurs
-			return fmt.Errorf("couldn't revoke grants from role'%s': %w", role.Name, err)
+			return fmt.Errorf("couldn't grants privileges to role '%s': %w", role.Name, err)
 		}
 	}
 
@@ -28,15 +28,16 @@ func (p *PGRole) Create(ctx context.Context, roles []types.Role) error {
 }
 
 func (p *PGRole) createQuery(role types.Role) string {
-	var query string
+	var query = fmt.Sprintf(`CREATE ROLE %s;`, role.Name)
 
 	for _, schema := range role.Schemas {
-		query += fmt.Sprintf(`CREATE ROLE %s;`, role.Name)
 		for _, grant := range schema.Grants {
+			query += fmt.Sprintf(`GRANT USAGE ON SCHEMA %s TO %s;`, schema.Schema, role.Name)
+
 			if strings.ToUpper(grant) == "SELECT" {
-				query += fmt.Sprintf(`GRANT %s ON ALL TABLES IN SCHEMA %s TO %s`, grant, schema.Schema, role.Name)
+				query += fmt.Sprintf(`GRANT %s ON ALL TABLES IN SCHEMA %s TO %s;`, grant, schema.Schema, role.Name)
 			} else {
-				query += fmt.Sprintf(`GRANT %s ON %s TO %s;`, grant, schema.Schema, role.Name)
+				query += fmt.Sprintf(`GRANT %s ON SCHEMA %s TO %s;`, grant, schema.Schema, role.Name)
 			}
 		}
 	}

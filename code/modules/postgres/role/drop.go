@@ -29,7 +29,8 @@ func (p *PGRole) Drop(ctx context.Context, roles []types.Role) error {
 func (p *PGRole) dropQuery(role types.Role) string {
 	var query string
 	for _, schema := range role.Schemas {
-		query += fmt.Sprintf(`REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA %s FROM %s;`, schema.Schema, role.Name)
+		query += fmt.Sprintf(`REVOKE ALL PRIVILEGES ON SCHEMA %s FROM %s;`, schema.Schema, role.Name)
+		query += fmt.Sprintf(`REVOKE GRANT OPTION FOR ALL PRIVILEGES ON SCHEMA %s FROM %s;`, schema.Schema, role.Name)
 	}
 
 	query += fmt.Sprintf(`DROP ROLE %s`, role.Name)
