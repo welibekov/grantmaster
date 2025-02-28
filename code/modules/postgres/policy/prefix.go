@@ -2,11 +2,6 @@ package policy
 
 import "github.com/welibekov/grantmaster/modules/policy/types"
 
-// PGPolicy struct is assumed to be defined elsewhere in your package
-type PGPolicy struct {
-	rolePrefix string // rolePrefix is the prefix to be added to each role in the policies
-}
-
 // addRolePrefix adds a prefix to each role in the given slice of policies.
 // It iterates through each policy and appends the rolePrefix to every role.
 func (p *PGPolicy) addRolePrefix(policies []types.Policy) []types.Policy {
