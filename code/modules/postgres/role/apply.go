@@ -18,11 +18,13 @@ func (p *PGRole) Apply(ctx context.Context, roles []types.Role) error {
 	}
 	debug.OutputMarshal(existingRoles, "exising roles") // Log the generated query for debugging purposes
 
-	createRoles := role.WhatToCreate(roles, existingRoles)
-	debug.OutputMarshal(createRoles, "roles to be created") // Log the generated query for debugging purposes
+	// FIXME: This two functions are not relevant now,
+	// but we still need some mechanism for drop roles.
+	//createRoles := role.WhatToCreate(roles, existingRoles)
+	//debug.OutputMarshal(createRoles, "roles to be created") // Log the generated query for debugging purposes
 
-	removeRoles := role.WhatToRemove(roles, existingRoles)
-	debug.OutputMarshal(removeRoles, "roles to be removed") // Log the generated query for debugging purposes
+	//removeRoles := role.WhatToRemove(roles, existingRoles)
+	//debug.OutputMarshal(removeRoles, "roles to be removed") // Log the generated query for debugging purposes
 
 	grantRoles := role.Diff(roles, existingRoles)
 	revokeRoles := role.Diff(existingRoles, roles)
@@ -36,18 +38,11 @@ func (p *PGRole) Apply(ctx context.Context, roles []types.Role) error {
 		}
 	}
 
-	if len(removeRoles) > 0 {
-		if err := p.Drop(ctx, removeRoles); err != nil {
+	if len(revokeRoles) > 0 {
+		if err := p.Revoke(ctx, revokeRoles); err != nil {
 			return err
 		}
 	}
-
-	// temporary disabled
-	//if len(grantRoles) > 0 {
-	//	if err := p.Grant(ctx, grantRoles); err != nil {
-	//		return err
-	//	}
-	//}
 
 	return nil
 }

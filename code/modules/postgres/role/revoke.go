@@ -8,9 +8,9 @@ import (
 	"github.com/welibekov/grantmaster/modules/role/types"
 )
 
-func (p *PGRole) Drop(ctx context.Context, roles []types.Role) error {
+func (p *PGRole) Revoke(ctx context.Context, roles []types.Role) error {
 	for _, role := range roles {
-		query := p.dropQuery(role)
+		query := p.revokeQuery(role)
 
 		logrus.Debugln(query) // Log the generated query for debugging purposes
 
@@ -26,14 +26,15 @@ func (p *PGRole) Drop(ctx context.Context, roles []types.Role) error {
 	return nil
 }
 
-func (p *PGRole) dropQuery(role types.Role) string {
+func (p *PGRole) revokeQuery(role types.Role) string {
 	var query string
 	for _, schema := range role.Schemas {
 		query += fmt.Sprintf(`REVOKE ALL PRIVILEGES ON SCHEMA %s FROM %s;`, schema.Schema, role.Name)
 		query += fmt.Sprintf(`REVOKE GRANT OPTION FOR ALL PRIVILEGES ON SCHEMA %s FROM %s;`, schema.Schema, role.Name)
 	}
 
-	query += fmt.Sprintf(`DROP ROLE %s`, role.Name)
+	//FIXME: Do we need to drop role at the end?
+	//query += fmt.Sprintf(`DROP ROLE %s`, role.Name)
 
 	return query
 }
