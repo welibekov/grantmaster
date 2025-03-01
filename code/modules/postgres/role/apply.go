@@ -30,8 +30,8 @@ func (p *PGRole) Apply(ctx context.Context, roles []types.Role) error {
 	debug.OutputMarshal(grantRoles, "roles to grant")
 	debug.OutputMarshal(revokeRoles, "roles to revoke")
 
-	if len(createRoles) > 0 {
-		if err := p.Create(ctx, createRoles); err != nil {
+	if len(grantRoles) > 0 {
+		if err := p.Grant(ctx, grantRoles); err != nil {
 			return err
 		}
 	}
