@@ -10,7 +10,6 @@ import (
 	"text/template"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/welibekov/grantmaster/modules/template/funcs"
 )
 
 var (
@@ -19,12 +18,15 @@ var (
 )
 
 type Template struct {
-	path string
-	body []byte
-	pool *pgxpool.Pool
+	path  string
+	body  []byte
+	pool  *pgxpool.Pool
+	bytes *bytes.Buffer
 }
 
 func New(path string, pool *pgxpool.Pool) (*Template, error) {
+	var templateBytes = bytes.NewBuffer([]byte{})
+
 	if !strings.HasSuffix(path, ".tmpl") {
 		path += ".tmpl"
 	}
@@ -35,31 +37,26 @@ func New(path string, pool *pgxpool.Pool) (*Template, error) {
 	}
 
 	return &Template{
-		path: path,
-		body: templateBody,
-		pool: pool,
+		path:  path,
+		body:  templateBody,
+		bytes: templateBytes,
+		pool:  pool,
 	}, nil
 }
 
 func (t *Template) Generate(ctx context.Context, parameters interface{}) ([]byte, error) {
-	var templateBytes = bytes.NewBuffer([]byte{})
-
-	fn := funcs.New(ctx, t.pool)
-
-	tmpl := template.New(t.path).Funcs(template.FuncMap{
-		"isRoleExist": fn.IsRoleExist,
-	})
+	tmpl := template.New(t.path).Funcs(t.NewFuncs(ctx))
 
 	tmpl, err := tmpl.Parse(string(t.body))
 	if err != nil {
 		return nil, fmt.Errorf("coudn't parse template: %v", err)
 	}
 
-	if err := tmpl.ExecuteTemplate(templateBytes, t.path, parameters); err != nil {
+	if err := tmpl.ExecuteTemplate(t.bytes, t.path, parameters); err != nil {
 		return nil, fmt.Errorf("couldn't execute template: %v", err)
 	}
 
-	return removeEmptyLines(templateBytes.Bytes()), nil
+	return removeEmptyLines(t.bytes.Bytes()), nil
 }
 
 // removeEmptyLines takes a []byte, splits it into lines,
