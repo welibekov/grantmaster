@@ -19,9 +19,10 @@ build: copy_assets
 
 # Copy assets
 copy_assets:
+	@echo "Copying assets to the templates..."
 	@rm -rf $(ASSETS_TEMP_DIR)
 	@mkdir -p $(ASSETS_TEMP_DIR)
-	@cp -prf $(TEMPLATES_DIR)/* $(ASSETS_TEMP_DIR)/
+	@cp -prvf $(TEMPLATES_DIR)/* $(ASSETS_TEMP_DIR)/
 
 # Clean the bin directory
 clean:
