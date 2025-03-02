@@ -1,4 +1,4 @@
-package template
+package funcs
 
 import (
 	"context"
@@ -10,17 +10,23 @@ import (
 )
 
 type Funcs struct {
+	ctx  context.Context
 	pool *pgxpool.Pool
 }
 
-func (f *Funcs) isRoleExist(role types.Role) bool {
-	ctx := context.Background()
+func New(ctx context.Context, pool *pgxpool.Pool) *Funcs {
+	return &Funcs{
+		ctx:  ctx,
+		pool: pool,
+	}
+}
 
+func (f *Funcs) IsRoleExist(role types.Role) bool {
 	query := fmt.Sprintf(`SELECT 1 FROM pg_roles WHERE rolname = '%s';`, role.Name)
 
 	logrus.Debugln(query)
 
-	rows, err := f.pool.Query(ctx, query)
+	rows, err := f.pool.Query(f.ctx, query)
 	if err != nil {
 		logrus.Errorf("couldn't find if role exist: %v", err)
 		return false

@@ -2,6 +2,7 @@ package template
 
 import (
 	"bytes"
+	"context"
 	"embed"
 	"fmt"
 	"path/filepath"
@@ -9,6 +10,7 @@ import (
 	"text/template"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/welibekov/grantmaster/modules/template/funcs"
 )
 
 var (
@@ -16,31 +18,44 @@ var (
 	assetsDir embed.FS
 )
 
-func Generate(path string, pool *pgxpool.Pool, parameters interface{}) ([]byte, error) {
-	var templateBytes = bytes.NewBuffer([]byte{})
+type Template struct {
+	path string
+	body []byte
+	pool *pgxpool.Pool
+}
 
+func New(path string, pool *pgxpool.Pool) (*Template, error) {
 	if !strings.HasSuffix(path, ".tmpl") {
 		path += ".tmpl"
 	}
-
-	fn := &Funcs{pool}
-
-	tmpl := template.New(path)
-	tmpl = tmpl.Funcs(template.FuncMap{
-		"isRoleExist": fn.isRoleExist,
-	})
 
 	templateBody, err := assetsDir.ReadFile(filepath.Join("assets", path))
 	if err != nil {
 		return nil, fmt.Errorf("couldn't read template: %v", err)
 	}
 
-	tmpl, err = tmpl.Parse(string(templateBody))
+	return &Template{
+		path: path,
+		body: templateBody,
+		pool: pool,
+	}, nil
+}
+
+func (t *Template) Generate(ctx context.Context, parameters interface{}) ([]byte, error) {
+	var templateBytes = bytes.NewBuffer([]byte{})
+
+	fn := funcs.New(ctx, t.pool)
+
+	tmpl := template.New(t.path).Funcs(template.FuncMap{
+		"isRoleExist": fn.IsRoleExist,
+	})
+
+	tmpl, err := tmpl.Parse(string(t.body))
 	if err != nil {
 		return nil, fmt.Errorf("coudn't parse template: %v", err)
 	}
 
-	if err := tmpl.ExecuteTemplate(templateBytes, path, parameters); err != nil {
+	if err := tmpl.ExecuteTemplate(templateBytes, t.path, parameters); err != nil {
 		return nil, fmt.Errorf("couldn't execute template: %v", err)
 	}
 

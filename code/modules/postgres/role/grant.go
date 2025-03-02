@@ -10,7 +10,12 @@ import (
 )
 
 func (p *PGRole) Grant(ctx context.Context, roles []types.Role) error {
-	queryBody, err := template.Generate("postgres/role/grant.tmpl", p.pool, roles)
+	tmpl, err := template.New("postgres/role/grant.tmpl", p.pool)
+	if err != nil {
+		return fmt.Errorf("couldn't create new template: %v", err)
+	}
+
+	queryBody, err := tmpl.Generate(ctx, roles)
 	if err != nil {
 		return fmt.Errorf("couldn't generate grant query template: %v", err)
 	}

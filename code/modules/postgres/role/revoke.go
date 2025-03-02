@@ -10,7 +10,12 @@ import (
 )
 
 func (p *PGRole) Revoke(ctx context.Context, roles []types.Role) error {
-	queryBody, err := template.Generate("postgres/role/revoke.tmpl", p.pool, roles)
+	tmpl, err := template.New("postgres/role/revoke.tmpl", p.pool)
+	if err != nil {
+		return fmt.Errorf("couldn't create template: %v", err)
+	}
+
+	queryBody, err := tmpl.Generate(ctx, roles)
 	if err != nil {
 		return fmt.Errorf("couldn't generate revoke query template: %v", err)
 	}
