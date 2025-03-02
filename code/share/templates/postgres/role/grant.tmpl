@@ -1,0 +1,15 @@
+{{ $query := "" }}
+{{ range $role := .}}
+{{  if (not (isRoleExist $role)) }}
+{{    $query = (printf "CREATE ROLE %s;" $role.Name) }}
+{{  end }}
+{{   range $schema := $role.Schemas }}
+{{     range $grant := $schema.Grants }}
+{{       if (eq $grant "select") }}
+{{         (printf "%s GRANT %s ON ALL TABLES IN SCHEMA %s TO %s;" $query $grant $schema.Schema $role.Name) }}
+{{       else }}
+{{         (printf "%s GRANT %s ON SCHEMA %s TO %s;" $query $grant $schema.Schema $role.Name) }}
+{{       end }}
+{{     end }}
+{{   end }}
+{{ end }}

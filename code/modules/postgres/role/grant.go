@@ -5,26 +5,44 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gophercloud/gophercloud/openstack/identity/v3/roles"
 	"github.com/sirupsen/logrus"
 	"github.com/welibekov/grantmaster/modules/role/types"
+	"github.com/welibekov/grantmaster/modules/template"
 )
 
 func (p *PGRole) Grant(ctx context.Context, roles []types.Role) error {
-	for _, role := range roles {
-		query, err := p.grantQuery(ctx, role)
-		if err != nil {
-			return fmt.Errorf("couldn't construct grant query: %v", err)
-		}
-
-		logrus.Debugln(*query) // Log the generated query for debugging purposes
-
-		// Execute the grant query on schema in the PostgreSQL database
-		_, err = p.pool.Exec(ctx, *query)
-		if err != nil {
-			// Wrap the error with more context to help identify the issue if it occurs
-			return fmt.Errorf("couldn't grants privileges to role '%s': %w", role.Name, err)
-		}
+	queryBody, err := template.Generate("postgres/role/grant.tmpl", p.pool, roles)
+	if err != nil {
+		return fmt.Errorf("couldn't generate grant template: %v", err)
 	}
+
+	_, err = p.pool.Exec(ctx, string(queryBody))
+	if err != nil {
+		return fmt.Errorf("couldn't construct grant query: %v", err)
+	}
+
+	return nil
+}
+
+// All below functions and methods are not relevant when template generation
+// is in place.
+func (p *GPRole) GrantOldVersion(ctx context.Context, roles []roles.Role) error {
+	//for _, role := range roles {
+	//	query, err := p.grantQuery(ctx, role)
+	//	if err != nil {
+	//		return fmt.Errorf("couldn't construct grant query: %v", err)
+	//	}
+
+	//	logrus.Debugln(*query) // Log the generated query for debugging purposes
+
+	//	// Execute the grant query on schema in the PostgreSQL database
+	//	_, err = p.pool.Exec(ctx, *query)
+	//	if err != nil {
+	//		// Wrap the error with more context to help identify the issue if it occurs
+	//		return fmt.Errorf("couldn't grants privileges to role '%s': %w", role.Name, err)
+	//	}
+	//}
 
 	// Return nil if all policies were processed without errors
 	return nil
