@@ -28,6 +28,7 @@ func (p *PGRole) Apply(ctx context.Context, roles []types.Role) error {
 
 	grantRoles := role.Diff(roles, existingRoles)
 	revokeRoles := role.Diff(existingRoles, roles)
+	dropRoles := role.WhatToRemove(roles, existingRoles)
 
 	debug.OutputMarshal(grantRoles, "roles to grant")
 	debug.OutputMarshal(revokeRoles, "roles to revoke")
@@ -40,6 +41,12 @@ func (p *PGRole) Apply(ctx context.Context, roles []types.Role) error {
 
 	if len(revokeRoles) > 0 {
 		if err := p.Revoke(ctx, revokeRoles); err != nil {
+			return err
+		}
+	}
+
+	if len(dropRoles) > 0 {
+		if err := p.Drop(ctx, dropRoles); err != nil {
 			return err
 		}
 	}
