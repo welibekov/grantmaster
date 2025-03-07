@@ -3,11 +3,9 @@ package role
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/sirupsen/logrus"
 	"github.com/welibekov/grantmaster/modules/role/types"
-	"github.com/welibekov/grantmaster/modules/utils"
 )
 
 func (p *PGRole) Grant(ctx context.Context, roles []types.Role) error {
@@ -25,7 +23,7 @@ func (p *PGRole) Grant(ctx context.Context, roles []types.Role) error {
 
 		for _, schema := range role.Schemas {
 			for _, grant := range schema.Grants {
-				if utils.In(strings.ToLower(grant), []string{"select"}) {
+				if p.IsTableLevelGrant(grant) {
 					query += fmt.Sprintf("GRANT %s ON ALL TABLES IN SCHEMA %s TO %s;", grant, schema.Schema, role.Name)
 				} else {
 					query += fmt.Sprintf("GRANT %s ON SCHEMA %s TO %s;", grant, schema.Schema, role.Name)

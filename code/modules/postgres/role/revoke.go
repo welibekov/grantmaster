@@ -3,11 +3,9 @@ package role
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/sirupsen/logrus"
 	"github.com/welibekov/grantmaster/modules/role/types"
-	"github.com/welibekov/grantmaster/modules/utils"
 )
 
 func (p *PGRole) Revoke(ctx context.Context, roles []types.Role) error {
@@ -22,7 +20,7 @@ func (p *PGRole) Revoke(ctx context.Context, roles []types.Role) error {
 		if exist {
 			for _, schema := range role.Schemas {
 				for _, grant := range schema.Grants {
-					if utils.In(strings.ToLower(grant), []string{"select"}) {
+					if p.IsTableLevelGrant(grant) {
 						query += fmt.Sprintf("REVOKE %s ON ALL TABLES IN SCHEMA %s FROM %s;", grant, schema.Schema, role.Name)
 					} else {
 						query += fmt.Sprintf("REVOKE %s ON SCHEMA %s FROM %s;", grant, schema.Schema, role.Name)

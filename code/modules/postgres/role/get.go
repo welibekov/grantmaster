@@ -24,8 +24,8 @@ WITH granted_table_permissions AS (
         privilege_type AS permission_name,
         'YES' AS has_access
     FROM information_schema.role_table_grants
-    WHERE table_schema NOT LIKE 'pg_%'  -- Exclude system schemas
-    AND table_schema NOT IN ('information_schema', 'public')  -- Exclude public schema
+    WHERE table_schema NOT LIKE 'pg_%'
+    AND table_schema NOT IN ('information_schema', 'public')
     AND grantee LIKE 'dwh_%'
 ),
 all_table_permissions AS (
@@ -33,28 +33,46 @@ all_table_permissions AS (
         r.rolname AS role_or_user,
         n.nspname AS schema_name,
         unnest(ARRAY['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'REFERENCES', 'TRIGGER']) AS permission_name,
-        'NO' AS has_access  -- Default to NO until checked
+        'NO' AS has_access
     FROM pg_class c
     JOIN pg_namespace n ON c.relnamespace = n.oid
     CROSS JOIN pg_roles r
-    WHERE c.relkind IN ('r', 'v', 'm')  -- Tables, views, materialized views
+    WHERE c.relkind IN ('r', 'v', 'm')  
     AND n.nspname NOT LIKE 'pg_%'
-    AND n.nspname NOT IN ('information_schema', 'public')  -- Exclude public schema
+    AND n.nspname NOT IN ('information_schema', 'public')
     AND r.rolname LIKE 'dwh_%'
 ),
 granted_schema_permissions AS (
+    -- Explicitly checking USAGE privilege
     SELECT 
         r.rolname AS role_or_user,
         n.nspname AS schema_name,
-        unnest(ARRAY['USAGE', 'CREATE']) AS permission_name,
+        'USAGE' AS permission_name,
         CASE 
-            WHEN has_schema_privilege(r.rolname, n.nspname, 'USAGE') THEN 'YES' 
+            WHEN has_schema_privilege(r.rolname, n.oid, 'USAGE') THEN 'YES' 
             ELSE 'NO' 
         END AS has_access
     FROM pg_namespace n
     CROSS JOIN pg_roles r
     WHERE n.nspname NOT LIKE 'pg_%'
-    AND n.nspname NOT IN ('information_schema', 'public')  -- Exclude public schema
+    AND n.nspname NOT IN ('information_schema', 'public')
+    AND r.rolname LIKE 'dwh_%'
+
+    UNION ALL
+
+    -- Explicitly checking CREATE privilege
+    SELECT 
+        r.rolname AS role_or_user,
+        n.nspname AS schema_name,
+        'CREATE' AS permission_name,
+        CASE 
+            WHEN has_schema_privilege(r.rolname, n.oid, 'CREATE') THEN 'YES' 
+            ELSE 'NO' 
+        END AS has_access
+    FROM pg_namespace n
+    CROSS JOIN pg_roles r
+    WHERE n.nspname NOT LIKE 'pg_%'
+    AND n.nspname NOT IN ('information_schema', 'public')
     AND r.rolname LIKE 'dwh_%'
 ),
 all_schema_permissions AS (
@@ -62,11 +80,11 @@ all_schema_permissions AS (
         r.rolname AS role_or_user,
         n.nspname AS schema_name,
         unnest(ARRAY['USAGE', 'CREATE']) AS permission_name,
-        'NO' AS has_access  -- Default to NO until checked
+        'NO' AS has_access
     FROM pg_namespace n
     CROSS JOIN pg_roles r
     WHERE n.nspname NOT LIKE 'pg_%'
-    AND n.nspname NOT IN ('information_schema', 'public')  -- Exclude public schema
+    AND n.nspname NOT IN ('information_schema', 'public')
     AND r.rolname LIKE 'dwh_%'
 )
 SELECT 

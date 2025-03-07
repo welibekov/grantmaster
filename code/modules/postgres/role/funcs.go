@@ -3,9 +3,11 @@ package role
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 	"github.com/welibekov/grantmaster/modules/role/types"
+	"github.com/welibekov/grantmaster/modules/utils"
 )
 
 func (p *PGRole) IsRoleExist(ctx context.Context, role types.Role) (bool, error) {
@@ -34,4 +36,8 @@ func (p *PGRole) IsRoleExist(ctx context.Context, role types.Role) (bool, error)
 	}
 
 	return exist == 1, nil
+}
+
+func (p *PGRole) IsTableLevelGrant(grant string) bool {
+	return utils.In(strings.ToUpper(grant), TableLevelGrants)
 }
