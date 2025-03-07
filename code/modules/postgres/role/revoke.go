@@ -7,5 +7,5 @@ import (
 )
 
 func (p *PGRole) Revoke(ctx context.Context, roles []types.Role) error {
-	return p.exec(ctx, roles, "postgres/role/revoke.tmpl")
+	return p.Drop(ctx, roles)
 }

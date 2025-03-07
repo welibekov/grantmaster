@@ -12,7 +12,8 @@ func (p *PGRole) Apply(ctx context.Context, roles []types.Role) error {
 	roles = p.addRolePrefix(roles)
 	debug.OutputMarshal(roles, "roles requested")
 
-	existingRoles, err := p.GetExisting(ctx)
+	//existingRoles, err := p.GetExisting(ctx)
+	existingRoles, err := p.Get(ctx)
 	if err != nil {
 		return err
 	}

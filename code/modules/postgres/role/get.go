@@ -3,39 +3,92 @@ package role
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/welibekov/grantmaster/modules/role/types"
 )
 
-// GetExisting retrieves existing roles from the database.
-func (p *PGRole) GetExisting(ctx context.Context) ([]types.Role, error) {
-	// Map to hold roles associated with each username.
-	rolesMap := make(map[string][]types.Schema)
+// Get retrieves existing roles and their grants from the database.
+func (p *PGRole) Get(ctx context.Context) ([]types.Role, error) {
+	// Map to hold schemas and their grants associated with each role.
+	rolesMap := make(map[string]map[string][]string)
 
 	// Slice to hold the resulting roles.
 	roles := make([]types.Role, 0)
 
-	query := fmt.Sprintf(`
-SELECT
-    nspname AS schema_name,
-    rolname AS role_name,
-    pg_catalog.has_schema_privilege(rolname, n.oid, 'USAGE') AS has_usage,
-    pg_catalog.has_schema_privilege(rolname, n.oid, 'CREATE') AS has_create
-FROM
-    pg_catalog.pg_roles r
-JOIN
-    pg_catalog.pg_namespace n
-    ON pg_catalog.has_schema_privilege(r.rolname, n.oid, 'USAGE')
-WHERE
-    r.rolname LIKE '%s%%'
-    AND n.nspname NOT LIKE 'pg_%%'
-    AND n.nspname != 'information_schema'
-    AND n.nspname != 'pg_catalog'
-    AND n.nspname != 'public'
-ORDER BY
-    schema_name, role_name;
-`, p.rolePrefix)
-
+	query := `
+WITH granted_table_permissions AS (
+    SELECT 
+        grantee AS role_or_user,
+        table_schema AS schema_name,
+        privilege_type AS permission_name,
+        'YES' AS has_access
+    FROM information_schema.role_table_grants
+    WHERE table_schema NOT LIKE 'pg_%'  -- Exclude system schemas
+    AND table_schema NOT IN ('information_schema', 'public')  -- Exclude public schema
+    AND grantee LIKE 'dwh_%'
+),
+all_table_permissions AS (
+    SELECT 
+        r.rolname AS role_or_user,
+        n.nspname AS schema_name,
+        unnest(ARRAY['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'REFERENCES', 'TRIGGER']) AS permission_name,
+        'NO' AS has_access  -- Default to NO until checked
+    FROM pg_class c
+    JOIN pg_namespace n ON c.relnamespace = n.oid
+    CROSS JOIN pg_roles r
+    WHERE c.relkind IN ('r', 'v', 'm')  -- Tables, views, materialized views
+    AND n.nspname NOT LIKE 'pg_%'
+    AND n.nspname NOT IN ('information_schema', 'public')  -- Exclude public schema
+    AND r.rolname LIKE 'dwh_%'
+),
+granted_schema_permissions AS (
+    SELECT 
+        r.rolname AS role_or_user,
+        n.nspname AS schema_name,
+        unnest(ARRAY['USAGE', 'CREATE']) AS permission_name,
+        CASE 
+            WHEN has_schema_privilege(r.rolname, n.nspname, 'USAGE') THEN 'YES' 
+            ELSE 'NO' 
+        END AS has_access
+    FROM pg_namespace n
+    CROSS JOIN pg_roles r
+    WHERE n.nspname NOT LIKE 'pg_%'
+    AND n.nspname NOT IN ('information_schema', 'public')  -- Exclude public schema
+    AND r.rolname LIKE 'dwh_%'
+),
+all_schema_permissions AS (
+    SELECT 
+        r.rolname AS role_or_user,
+        n.nspname AS schema_name,
+        unnest(ARRAY['USAGE', 'CREATE']) AS permission_name,
+        'NO' AS has_access  -- Default to NO until checked
+    FROM pg_namespace n
+    CROSS JOIN pg_roles r
+    WHERE n.nspname NOT LIKE 'pg_%'
+    AND n.nspname NOT IN ('information_schema', 'public')  -- Exclude public schema
+    AND r.rolname LIKE 'dwh_%'
+)
+SELECT 
+    ap.role_or_user,
+    ap.schema_name,
+    ap.permission_name,
+    COALESCE(gp.has_access, 'NO') AS has_access
+FROM (
+    SELECT role_or_user, schema_name, permission_name, has_access FROM all_table_permissions
+    UNION ALL
+    SELECT role_or_user, schema_name, permission_name, has_access FROM all_schema_permissions
+) ap
+LEFT JOIN (
+    SELECT role_or_user, schema_name, permission_name, has_access FROM granted_table_permissions
+    UNION ALL
+    SELECT role_or_user, schema_name, permission_name, has_access FROM granted_schema_permissions
+) gp
+    ON ap.role_or_user = gp.role_or_user
+    AND ap.schema_name = gp.schema_name
+    AND ap.permission_name = gp.permission_name
+ORDER BY ap.role_or_user, ap.schema_name, ap.permission_name;
+`
 	rows, err := p.pool.Query(ctx, query)
 	if err != nil {
 		// Wrap the error to include context about where it occurred.
@@ -46,28 +99,27 @@ ORDER BY
 	// Process each row returned by the query.
 	for rows.Next() {
 		var (
-			schema, role        string
-			hasUsage, hasCreate bool
+			role, schema, permission, hasAccess string
 		)
 
 		// Scan the row into the username and role variables.
-		if err := rows.Scan(&schema, &role, &hasUsage, &hasCreate); err != nil {
+		if err := rows.Scan(&role, &schema, &permission, &hasAccess); err != nil {
 			// Wrap the error to include context about scanning the row.
-			return roles, fmt.Errorf("failed to scan row for username: %w", err)
+			return roles, fmt.Errorf("failed to scan row: %w", err)
 		}
 
-		grants := p.getGrants(hasUsage, hasCreate)
+		if _, found := rolesMap[role][schema]; !found {
+			if _, exists := rolesMap[role]; !exists {
+				rolesMap[role] = make(map[string][]string)
+			}
 
-		// FIXME: This is a only workaround and should be removed in future.
-		// Please conduct meeting with database and datateam teams to
-		// find proper solution.
-		if len(grants) == 1 && grants[0] == "usage" { // workaround
-			grants = append(grants, "select")
+			rolesMap[role][schema] = []string{}
 		}
 
-		// Map the role to the corresponding username.
-		rolesMap[role] = append(rolesMap[role], types.Schema{
-			Schema: schema, Grants: append([]string{}, grants...)})
+		if hasAccess == "YES" {
+			rolesMap[role][schema] = append(rolesMap[role][schema], strings.ToLower(permission))
+		}
+
 	}
 
 	// Check for errors that may have occurred during the row iteration.
@@ -77,7 +129,18 @@ ORDER BY
 	}
 
 	// Convert the rolesMap to a list of policies.
-	for role, schemas := range rolesMap {
+	for role, schemasMap := range rolesMap {
+		var schemas []types.Schema
+
+		for schema, grants := range schemasMap {
+			if len(grants) > 0 {
+				schemas = append(schemas, types.Schema{
+					Schema: schema,
+					Grants: grants,
+				})
+			}
+		}
+
 		roles = append(roles, types.Role{
 			Name:    role,
 			Schemas: schemas,
@@ -86,32 +149,4 @@ ORDER BY
 
 	// Return the list of policies and no error.
 	return roles, nil
-}
-
-// getGrants generates a list of grant permissions based on the provided flags.
-// It takes two boolean parameters indicating whether to include "usage" and/or "create" permissions.
-//
-// Parameters:
-// - hasUsage: a boolean indicating if the "usage" permission should be included.
-// - hasCreate: a boolean indicating if the "create" permission should be included.
-//
-// Returns:
-// A slice of strings containing the granted permissions. It can include
-// "usage", "create", or both, depending on the input parameters.
-func (p *PGRole) getGrants(hasUsage, hasCreate bool) []string {
-	// Initialize a slice to hold the grants with a capacity of 2.
-	grants := make([]string, 0, 2)
-
-	// Check if the "usage" permission should be added.
-	if hasUsage {
-		grants = append(grants, "usage")
-	}
-
-	// Check if the "create" permission should be added.
-	if hasCreate {
-		grants = append(grants, "create")
-	}
-
-	// Return the slice of grants.
-	return grants
 }
