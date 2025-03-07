@@ -39,36 +39,14 @@ func (p *PGRole) IsExist(ctx context.Context, query string) (bool, error) {
 func (p *PGRole) IsRoleExist(ctx context.Context, role types.Role) (bool, error) {
 	query := fmt.Sprintf(`SELECT 1 FROM pg_roles WHERE rolname = '%s';`, role.Name)
 
-	logrus.Debugln(query)
-
-	rows, err := p.pool.Query(ctx, query)
-	if err != nil {
-		return false, fmt.Errorf("couldn't find if role exist: %v", err)
-	}
-	defer rows.Close()
-
-	var exist int
-
-	for rows.Next() {
-		if err := rows.Scan(&exist); err != nil {
-			return false, fmt.Errorf("failed to scan row for checking role: %v", err)
-		}
-
-		break
-	}
-
-	if err := rows.Err(); err != nil {
-		return false, fmt.Errorf("error occurred while iterating over rows: %v", err)
-	}
-
-	return exist == 1, nil
+	return p.IsExist(ctx, query)
 }
 
-func (p *PGRole) IsTableLevelGrant(grant string) bool {
+func (p *PGRole) IsItTableLevelGrant(grant string) bool {
 	return utils.In(strings.ToUpper(grant), TableLevelGrants)
 }
 
-func (p *PGRole) TablesExistInSchema(ctx context.Context, schema types.Schema) bool {
+func (p *PGRole) IsTablesExistInSchema(ctx context.Context, schema types.Schema) bool {
 	query := fmt.Sprintf(`
 SELECT COUNT(*) 
 FROM information_schema.tables

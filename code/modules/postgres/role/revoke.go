@@ -23,7 +23,7 @@ func (p *PGRole) Revoke(ctx context.Context, roles []types.Role) error {
 
 		for _, schema := range role.Schemas {
 			for _, grant := range schema.Grants {
-				if p.IsTableLevelGrant(grant) {
+				if p.IsItTableLevelGrant(grant) {
 					query += fmt.Sprintf("REVOKE %s ON ALL TABLES IN SCHEMA %s FROM %s;", grant, schema.Schema, role.Name)
 				} else {
 					query += fmt.Sprintf("REVOKE %s ON SCHEMA %s FROM %s;", grant, schema.Schema, role.Name)

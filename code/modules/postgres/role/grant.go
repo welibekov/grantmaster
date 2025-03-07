@@ -22,10 +22,10 @@ func (p *PGRole) Grant(ctx context.Context, roles []types.Role) error {
 		}
 
 		for _, schema := range role.Schemas {
-			tablesExistInSchema := p.TablesExistInSchema(ctx, schema)
+			tablesExistInSchema := p.IsTablesExistInSchema(ctx, schema)
 
 			for _, grant := range schema.Grants {
-				if p.IsTableLevelGrant(grant) {
+				if p.IsItTableLevelGrant(grant) {
 
 					if !tablesExistInSchema {
 						logrus.Warnf("no tables in schema '%s', skipping '%s' grant", schema.Schema, grant)
