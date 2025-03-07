@@ -126,18 +126,20 @@ ORDER BY ap.role_or_user, ap.schema_name, ap.permission_name;
 			return roles, fmt.Errorf("failed to scan row: %w", err)
 		}
 
-		if _, found := rolesMap[role][schema]; !found {
-			if _, exists := rolesMap[role]; !exists {
-				rolesMap[role] = make(map[string][]string)
-			}
+		if hasAccess != "YES" { // if no grant provided just continue.
+			continue
+		}
 
+		if _, exist := rolesMap[role]; !exist { // if no role exist in map just create it.
+			rolesMap[role] = make(map[string][]string)
+		}
+
+		if _, found := rolesMap[role][schema]; !found { // if no schema found in map create it.
 			rolesMap[role][schema] = []string{}
 		}
 
-		if hasAccess == "YES" {
-			rolesMap[role][schema] = append(rolesMap[role][schema], strings.ToLower(permission))
-		}
-
+		// add grants to the map.
+		rolesMap[role][schema] = append(rolesMap[role][schema], strings.ToLower(permission))
 	}
 
 	// Check for errors that may have occurred during the row iteration.
