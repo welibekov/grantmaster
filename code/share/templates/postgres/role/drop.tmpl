@@ -1,7 +1,0 @@
-{{ range $role := . }}
-{{   range $schema := $role.Schemas }}
-{{     (printf "REVOKE ALL PRIVILEGES ON SCHEMA %s FROM %s;" $schema.Schema $role.Name) }}
-{{     (printf "REVOKE GRANT OPTION FOR ALL PRIVILEGES ON SCHEMA %s FROM %s;" $schema.Schema $role.Name) }}
-{{     (printf "DROP ROLE %s;" $role.Name)
-{{   end }}
-{{ end }}
