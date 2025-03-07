@@ -22,8 +22,16 @@ func (p *PGRole) Grant(ctx context.Context, roles []types.Role) error {
 		}
 
 		for _, schema := range role.Schemas {
+			tablesExistInSchema := p.TablesExistInSchema(ctx, schema)
+
 			for _, grant := range schema.Grants {
 				if p.IsTableLevelGrant(grant) {
+
+					if !tablesExistInSchema {
+						logrus.Warnf("no tables in schema '%s', skipping '%s' grant", schema.Schema, grant)
+						continue
+					}
+
 					query += fmt.Sprintf("GRANT %s ON ALL TABLES IN SCHEMA %s TO %s;", grant, schema.Schema, role.Name)
 				} else {
 					query += fmt.Sprintf("GRANT %s ON SCHEMA %s TO %s;", grant, schema.Schema, role.Name)
