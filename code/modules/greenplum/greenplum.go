@@ -26,8 +26,8 @@ func New(config map[string]string) (*Greenplum, error) {
 
 	// Return a new Greenplum instance with the initialized database and connection string
 	return &Greenplum{
-		Database:   base.NewDatabase(), // Initialize the base.Database
-		connString: connString,         // Set the connection string
+		Database:   base.NewDatabase(config), // Initialize the base.Database
+		connString: connString,               // Set the connection string
 	}, nil
 }
 

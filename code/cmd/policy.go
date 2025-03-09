@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/welibekov/grantmaster/modules/assets"
 	"github.com/welibekov/grantmaster/modules/config"
-	"github.com/welibekov/grantmaster/modules/database"
+	"github.com/welibekov/grantmaster/modules/policy"
 	"github.com/welibekov/grantmaster/modules/policy/types"
 )
 
@@ -33,6 +33,9 @@ func applyPolicy() error {
 	// Load configuration from environment variables
 	config := config.Load()
 
+	// Set context
+	ctx := context.Background()
+
 	// Read policies from file or directory.
 	policies, err := assets.ReadAssets[types.Policy](policyFile)
 	if err != nil {
@@ -45,11 +48,11 @@ func applyPolicy() error {
 	}
 
 	// Create an instance of database
-	databaseInstance, err := database.New(config)
+	databaseInstance, err := policy.New(ctx, config)
 	if err != nil {
 		return fmt.Errorf("failed to create database instance: %w", err)
 	}
 
 	// Apply policies
-	return databaseInstance.ApplyPolicy(context.Background(), policies)
+	return databaseInstance.Apply(ctx, policies)
 }

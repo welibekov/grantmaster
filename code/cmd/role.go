@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/welibekov/grantmaster/modules/assets"
 	"github.com/welibekov/grantmaster/modules/config"
-	"github.com/welibekov/grantmaster/modules/database"
+	"github.com/welibekov/grantmaster/modules/role"
 	"github.com/welibekov/grantmaster/modules/role/types"
 )
 
@@ -45,11 +45,13 @@ func applyRole() error {
 	}
 
 	// Create an instance of database
-	databaseInstance, err := database.New(config)
+	ctx := context.Background()
+
+	databaseInstance, err := role.New(ctx, config)
 	if err != nil {
 		return fmt.Errorf("failed to create database instance: %w", err)
 	}
 
 	// Apply roles
-	return databaseInstance.ApplyRole(context.Background(), roles)
+	return databaseInstance.Apply(ctx, roles)
 }

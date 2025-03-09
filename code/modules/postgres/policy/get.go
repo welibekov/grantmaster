@@ -8,7 +8,7 @@ import (
 )
 
 // GetExisting retrieves existing policies from the database.
-func (p *PGPolicy) GetExisting(ctx context.Context) ([]types.Policy, error) {
+func (p *PGPolicy) Get(ctx context.Context) ([]types.Policy, error) {
 	// Map to hold roles associated with each username.
 	rolesMap := make(map[string][]string)
 
