@@ -1,4 +1,4 @@
-package role
+package policy
 
 import (
 	"context"
@@ -7,15 +7,15 @@ import (
 	"github.com/welibekov/grantmaster/modules/databaser"
 	//fakegres "github.com/welibekov/grantmaster/modules/fakegres/role"
 	//greenplum "github.com/welibekov/grantmaster/modules/greenplum/role"
-	pgRole "github.com/welibekov/grantmaster/modules/postgres/role"
+	pgPol "github.com/welibekov/grantmaster/modules/postgres/policy"
 	"github.com/welibekov/grantmaster/modules/types"
 )
 
-func New(ctx context.Context, config map[string]string) (databaser.Roler, error) {
+func New(ctx context.Context, config map[string]string) (databaser.Policier, error) {
 	switch types.DatabaseType(config["GM_DATABASE_TYPE"]) {
 	case types.Postgres:
 		// Initialize Postgres database
-		return pgRole.New(ctx, config)
+		return pgPol.New(ctx, config)
 	//case types.Fakegres:
 	// Initialize Fakegres database
 	//	return fakegres.New(config)

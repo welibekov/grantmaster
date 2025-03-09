@@ -10,7 +10,7 @@ func (p *PGPolicy) addRolePrefix(policies []types.Policy) []types.Policy {
 		// Iterate over each role in the current policy
 		for roleIndex, role := range policy.Roles {
 			// Add the predefined prefix to the role
-			policy.Roles[roleIndex] = p.rolePrefix + role
+			policy.Roles[roleIndex] = p.RolePrefix + role
 		}
 
 		// Update the modified policy back into the policies slice

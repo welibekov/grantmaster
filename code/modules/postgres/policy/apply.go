@@ -13,6 +13,8 @@ import (
 // Apply applies the provided policies to the system by revoking existing policies
 // that are no longer applicable and granting new policies as necessary.
 func (p *PGPolicy) Apply(ctx context.Context, policies []types.Policy) error {
+	defer p.pool.Close()
+
 	// Add a prefix related to roles to the incoming policies for consistency
 	policies = p.addRolePrefix(policies)
 
@@ -27,12 +29,10 @@ func (p *PGPolicy) Apply(ctx context.Context, policies []types.Policy) error {
 
 	// Determine which policies need to be revoked by comparing existing and new policies
 	revokePolicies := utils.Diff(policies, existingPolicies)
-
 	debug.OutputMarshal(revokePolicies, "revoke policies")
 
 	// Determine which new policies need to be granted by comparing existing and new policies
 	grantPolicies := utils.Diff(existingPolicies, policies)
-
 	debug.OutputMarshal(grantPolicies, "grant policies")
 
 	// Log the count of policies identified for revocation for debugging purposes

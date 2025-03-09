@@ -6,16 +6,12 @@ import (
 	"github.com/welibekov/grantmaster/modules/databaser"
 	"github.com/welibekov/grantmaster/modules/fakegres"
 	"github.com/welibekov/grantmaster/modules/greenplum"
-	"github.com/welibekov/grantmaster/modules/postgres"
 	"github.com/welibekov/grantmaster/modules/types"
 )
 
 // New creates a new Databaser instance based on the provided configuration.
 func New(config map[string]string) (databaser.Databaser, error) {
 	switch types.DatabaseType(config["GM_DATABASE_TYPE"]) {
-	case types.Postgres:
-		// Initialize Postgres database
-		return postgres.New(config)
 	case types.Fakegres:
 		// Initialize Fakegres database
 		return fakegres.New(config)
