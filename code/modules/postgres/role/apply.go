@@ -3,12 +3,14 @@ package role
 import (
 	"context"
 
-	"github.com/welibekov/grantmaster/modules/role"
 	"github.com/welibekov/grantmaster/modules/role/types"
+	"github.com/welibekov/grantmaster/modules/role/utils"
 	"github.com/welibekov/grantmaster/modules/utils/debug"
 )
 
 func (p *PGRole) Apply(ctx context.Context, roles []types.Role) error {
+	defer p.pool.Close() // Ensure that the connection pool is closed when the function exits
+
 	roles = p.addRolePrefix(roles)
 	debug.OutputMarshal(roles, "roles requested")
 
@@ -18,9 +20,9 @@ func (p *PGRole) Apply(ctx context.Context, roles []types.Role) error {
 	}
 	debug.OutputMarshal(existingRoles, "exising roles") // Log the generated query for debugging purposes
 
-	grantRoles := role.Diff(roles, existingRoles)
-	revokeRoles := role.Diff(existingRoles, roles)
-	dropRoles := role.WhatToDrop(roles, existingRoles)
+	grantRoles := utils.Diff(roles, existingRoles)
+	revokeRoles := utils.Diff(existingRoles, roles)
+	dropRoles := utils.WhatToDrop(roles, existingRoles)
 
 	debug.OutputMarshal(grantRoles, "roles to grant")
 	debug.OutputMarshal(revokeRoles, "roles to revoke")

@@ -1,4 +1,4 @@
-package role
+package utils
 
 import (
 	"log"

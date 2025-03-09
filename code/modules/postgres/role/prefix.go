@@ -8,7 +8,7 @@ func (p *PGRole) addRolePrefix(roles []types.Role) []types.Role {
 	// Iterate over each role in the slice using an index to allow modification.
 	for index, role := range roles {
 		// Prepend the role prefix to the role's name.
-		role.Name = p.rolePrefix + role.Name
+		role.Name = p.Prefix + role.Name
 
 		// Update the role in the original slice with the modified role.
 		roles[index] = role

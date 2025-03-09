@@ -1,4 +1,4 @@
-package role
+package utils
 
 import "github.com/welibekov/grantmaster/modules/role/types"
 
