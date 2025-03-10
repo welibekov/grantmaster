@@ -51,10 +51,22 @@ gm apply policy --policy policy.yaml
 
 ```yaml
 - name: song_write
-  schema: song
+  schemas:
+    - schema: song
+      grants:
+        - usage
+        - select
+    - schema: lyrics
+      grants:
+        - usage
+        - select
 
 - name: song_read
-  schema: song
+  schemas:
+    - schema: song
+      grants:
+        - usage
+        - create
 ```
 
 ### Then apply role like
