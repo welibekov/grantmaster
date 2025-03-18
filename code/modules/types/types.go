@@ -8,3 +8,7 @@ var (
 	Greenplum DatabaseType = "greenplum" // Greenplum is a constant for the Greenplum database type.
 	Fakegres  DatabaseType = "fakegres"  // Fakegres is a constant for a mocked or fake database type.
 )
+
+func (d DatabaseType) ToString() string {
+	return string(d)
+}
