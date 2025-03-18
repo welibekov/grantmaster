@@ -1,6 +1,6 @@
 package databaser
 
-type Testerer interface {
+type RunTesterer interface {
 	Prepare() (func() error, error)
 	Execute() error
 }
