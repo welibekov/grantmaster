@@ -12,8 +12,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var databaseType string
-
 func init() {
 	rootCmd.AddCommand(gmRuntestCmd)
 }
@@ -46,7 +44,17 @@ var gmRuntestCmd = &cobra.Command{
 			return fmt.Errorf("no tests files found")
 		}
 
-		rt := runtest.New(config.Load(), tests...)
+		rt, err := runtest.New(config.Load(), tests)
+		if err != nil {
+			return err
+		}
+
+		cancel, err := rt.Prepare()
+		if err != nil {
+			return fmt.Errorf("couldn't prepare runtest env: %v", err)
+		}
+
+		defer cancel()
 
 		return rt.Execute()
 	},
