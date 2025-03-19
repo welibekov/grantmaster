@@ -19,7 +19,7 @@ func init() {
 
 var gmRuntestCmd = &cobra.Command{
 	Use:   "runtest",
-	Short: "Run tests of specific test type.",
+	Short: "Run tests of specific test type",
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		tests := []string{}
