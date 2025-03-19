@@ -44,7 +44,7 @@ go install github.com/welibekov/grantmaster@latest
 ```sh
 export GM_DATABASE_TYPE=fakegres
 
-gm apply policy --policy policy.yaml
+gm policy apply policy.yaml
 ```
 
 ### Example of role struct
@@ -73,6 +73,6 @@ gm apply policy --policy policy.yaml
 ```sh
 export GM_DATABASE_TYPE=fakegres
 
-gm apply role --role role.yaml
+gm role apply role.yaml
 ```
 

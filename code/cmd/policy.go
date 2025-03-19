@@ -10,11 +10,13 @@ import (
 	"github.com/welibekov/grantmaster/modules/config"
 	"github.com/welibekov/grantmaster/modules/policy"
 	"github.com/welibekov/grantmaster/modules/policy/types"
+	"gopkg.in/yaml.v3"
 )
 
 func init() {
 	rootCmd.AddCommand(gmPolicyCmd)
 	gmPolicyCmd.AddCommand(gmApplyPolicyCmd)
+	gmPolicyCmd.AddCommand(gmGetPolicyCmd)
 }
 
 var gmPolicyCmd = &cobra.Command{
@@ -64,4 +66,34 @@ func applyPolicy(policyFile string) error {
 
 	// Apply policies
 	return databaseInstance.Apply(ctx, policies)
+}
+
+// Get policies
+var gmGetPolicyCmd = &cobra.Command{
+	Use:   "get",
+	Short: "Get existing policies",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		// Create an instance of database
+		ctx := context.Background()
+
+		databaseInstance, err := policy.New(ctx, config.Load())
+		if err != nil {
+			return fmt.Errorf("failed to create database instance: %w", err)
+		}
+
+		// Get policies
+		policies, err := databaseInstance.Get(ctx)
+		if err != nil {
+			return fmt.Errorf("couldn't get existing policies: %v", err)
+		}
+
+		yamlBytes, err := yaml.Marshal(policies)
+		if err != nil {
+			return fmt.Errorf("couldn't marshal policies: %v", err)
+		}
+
+		fmt.Println(string(yamlBytes))
+
+		return nil
+	},
 }
