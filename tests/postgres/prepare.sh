@@ -7,6 +7,7 @@ export POSTGRES_PASS=${POSTGRES_PASS:-dwh}
 export POSTGRES_DATABASE=${POSTGRES_DATABASE:-dwh}
 export POSTGRES_TEMP_DIR=${POSTGRES_TEMP_DIR:-.}
 export POSTGRES_SERVICE=${POSTGRES_SERVICE:-postgres}
+export POSTGRES_PORT=${POSTGRES_POR:-5432}
 export GM_DATABASE_ROLE_PREFIX=${GM_DATABASE_ROLE_PREFIX:-dwh_}
 
 _fatal() {
@@ -114,8 +115,6 @@ _prepare_users() {
 }
 
 _spinup() {
-  export COMPOSE_INTERACTIVE_NO_CLI=1
-
   _gen_compose_file || exit 1
 
   _compose down -v --remove-orphans && \
