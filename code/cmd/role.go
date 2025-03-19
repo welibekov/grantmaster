@@ -10,11 +10,14 @@ import (
 	"github.com/welibekov/grantmaster/modules/config"
 	"github.com/welibekov/grantmaster/modules/role"
 	"github.com/welibekov/grantmaster/modules/role/types"
+
+	"gopkg.in/yaml.v3"
 )
 
 func init() {
 	rootCmd.AddCommand(gmRoleCmd)
 	gmRoleCmd.AddCommand(gmApplyRoleCmd)
+	gmRoleCmd.AddCommand(gmGetRoleCmd)
 }
 
 var gmRoleCmd = &cobra.Command{
@@ -63,4 +66,34 @@ func applyRole(roleFile string) error {
 
 	// Apply roles
 	return databaseInstance.Apply(ctx, roles)
+}
+
+// Get policies
+var gmGetRoleCmd = &cobra.Command{
+	Use:   "get",
+	Short: "Get existing roles",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		// Create an instance of database
+		ctx := context.Background()
+
+		databaseInstance, err := role.New(ctx, config.Load())
+		if err != nil {
+			return fmt.Errorf("failed to create database instance: %w", err)
+		}
+
+		// Get roles
+		roles, err := databaseInstance.Get(ctx)
+		if err != nil {
+			return fmt.Errorf("couldn't get existing roles: %v", err)
+		}
+
+		yamlBytes, err := yaml.Marshal(roles)
+		if err != nil {
+			return fmt.Errorf("couldn't marshal roles: %v", err)
+		}
+
+		fmt.Println(string(yamlBytes))
+
+		return nil
+	},
 }
