@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/welibekov/grantmaster/modules/assets"
@@ -11,25 +12,33 @@ import (
 	"github.com/welibekov/grantmaster/modules/role/types"
 )
 
-var roleFile string
-
 func init() {
-	gmApplyCmd.AddCommand(gmApplyRoleCmd)
-	gmApplyRoleCmd.Flags().StringVar(&roleFile, "role", "", "Path to role YAML file or directory (mandatory)")
-	gmApplyRoleCmd.MarkFlagRequired("role")
+	rootCmd.AddCommand(gmRoleCmd)
+	gmRoleCmd.AddCommand(gmApplyRoleCmd)
 }
 
-var gmApplyRoleCmd = &cobra.Command{
+var gmRoleCmd = &cobra.Command{
 	Use:   "role",
-	Short: "Apply roles from the specified YAML file or directory",
+	Short: "Maniulate database roles",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := applyRole(); err != nil {
-			fmt.Println("Error:", err)
-		}
+		cmd.Help()
+		os.Exit(1)
 	},
 }
 
-func applyRole() error {
+var gmApplyRoleCmd = &cobra.Command{
+	Use:   "apply",
+	Short: "Apply roles from the specified YAML file or directory",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) == 0 {
+			return fmt.Errorf("role.yaml file or directory not provided")
+		}
+
+		return applyRole(args[0])
+	},
+}
+
+func applyRole(roleFile string) error {
 	// Load configuration from environment variables
 	config := config.Load()
 

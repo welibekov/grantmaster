@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/welibekov/grantmaster/modules/assets"
@@ -11,25 +12,33 @@ import (
 	"github.com/welibekov/grantmaster/modules/policy/types"
 )
 
-var policyFile string
-
 func init() {
-	gmApplyCmd.AddCommand(gmApplyPolicyCmd)
-	gmApplyPolicyCmd.Flags().StringVar(&policyFile, "policy", "", "Path to policy YAML file (mandatory)")
-	gmApplyPolicyCmd.MarkFlagRequired("policy")
+	rootCmd.AddCommand(gmPolicyCmd)
+	gmPolicyCmd.AddCommand(gmApplyPolicyCmd)
 }
 
-var gmApplyPolicyCmd = &cobra.Command{
+var gmPolicyCmd = &cobra.Command{
 	Use:   "policy",
-	Short: "Apply policies from the specified YAML file or directory",
+	Short: "Maniulate database policies",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := applyPolicy(); err != nil {
-			fmt.Println("Error:", err)
-		}
+		cmd.Help()
+		os.Exit(1)
 	},
 }
 
-func applyPolicy() error {
+var gmApplyPolicyCmd = &cobra.Command{
+	Use:   "apply",
+	Short: "Apply policies from the specified YAML file or directory",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) == 0 {
+			return fmt.Errorf("role.yaml file or directory not provided")
+		}
+
+		return applyPolicy(args[0])
+	},
+}
+
+func applyPolicy(policyFile string) error {
 	// Load configuration from environment variables
 	config := config.Load()
 
