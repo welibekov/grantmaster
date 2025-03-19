@@ -55,7 +55,9 @@ func (r *Runtest) Execute() error {
 func (r *Runtest) exec(test string, env []string) *exec.Cmd {
 	cmd := exec.Command(test)
 	cmd.Env = append(os.Environ(), env...)
+	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 
 	return cmd
 }

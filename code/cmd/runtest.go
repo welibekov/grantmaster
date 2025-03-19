@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/welibekov/grantmaster/modules/config"
@@ -20,6 +21,7 @@ var gmRuntestCmd = &cobra.Command{
 	Use:   "runtest",
 	Short: "Run tests of specific test type.",
 	RunE: func(cmd *cobra.Command, args []string) error {
+
 		tests := []string{}
 
 		for _, arg := range args {
@@ -44,17 +46,26 @@ var gmRuntestCmd = &cobra.Command{
 			return fmt.Errorf("no tests files found")
 		}
 
-		rt, err := runtest.New(config.Load(), tests)
+		cfg := config.Load()
+
+		cleanup, err := strconv.ParseBool(cfg[config.RuntestCleanup])
+		if err != nil {
+			return fmt.Errorf("Wrong value for %s: %v", cfg[config.RuntestCleanup], err)
+		}
+
+		rt, err := runtest.New(cfg, tests)
 		if err != nil {
 			return err
 		}
 
-		cancel, err := rt.Prepare()
+		cleanupFn, err := rt.Prepare()
 		if err != nil {
 			return fmt.Errorf("couldn't prepare runtest env: %v", err)
 		}
 
-		defer cancel()
+		if cleanup {
+			defer cleanupFn()
+		}
 
 		return rt.Execute()
 	},
