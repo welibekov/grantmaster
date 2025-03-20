@@ -5,24 +5,28 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/welibekov/grantmaster/modules/types"
 )
 
 type Runtest struct {
-	Tests   []string
-	ExecDir string
+	DatabaseType types.DatabaseType
+	Tests        []string
+	ExecDir      string
 
 	gmBin string
 }
 
-func New(tests []string) (*Runtest, error) {
+func New(dbType types.DatabaseType, tests []string) (*Runtest, error) {
 	gmBin, err := os.Executable()
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get executable: %v", err)
 	}
 
 	return &Runtest{
-		Tests:   tests,
-		ExecDir: filepath.Dir(gmBin),
+		DatabaseType: dbType,
+		Tests:        tests,
+		ExecDir:      filepath.Dir(gmBin),
 
 		gmBin: gmBin,
 	}, nil
@@ -37,7 +41,7 @@ func (r *Runtest) Prepare() (func() error, error) {
 }
 
 func (r *Runtest) Execute() error {
-	gmTestDir, err := os.MkdirTemp(os.TempDir(), "gm-runtest-")
+	gmTestDir, err := os.MkdirTemp(os.TempDir(), fmt.Sprintf("gm-runtest-%s-", r.DatabaseType.ToString()))
 	if err != nil {
 		return fmt.Errorf("couldn't create test directory: %v", err)
 	}
