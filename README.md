@@ -28,6 +28,18 @@
 go install github.com/welibekov/grantmaster@latest
 ```
 
+### Build
+
+```sh
+make
+```
+
+### Run tests
+
+```sh
+make runtest
+```
+
 ### Example of policy struct
 
 ```yaml
