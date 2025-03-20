@@ -15,9 +15,6 @@ import (
 func (p *PGPolicy) Apply(ctx context.Context, policies []types.Policy) error {
 	defer p.pool.Close()
 
-	// Add a prefix related to roles to the incoming policies for consistency
-	policies = p.addRolePrefix(policies)
-
 	// Retrieve existing policies from the database to compare against
 	existingPolicies, err := p.Get(ctx)
 	if err != nil {

@@ -11,7 +11,6 @@ import (
 func (p *PGRole) Apply(ctx context.Context, roles []types.Role) error {
 	defer p.pool.Close() // Ensure that the connection pool is closed when the function exits
 
-	roles = p.addRolePrefix(roles)
 	debug.OutputMarshal(roles, "roles requested")
 
 	existingRoles, err := p.Get(ctx)
