@@ -10,6 +10,7 @@ import (
 	"github.com/welibekov/grantmaster/modules/config"
 	"github.com/welibekov/grantmaster/modules/role"
 	"github.com/welibekov/grantmaster/modules/role/types"
+	"github.com/welibekov/grantmaster/modules/role/utils"
 
 	"gopkg.in/yaml.v3"
 )
@@ -43,7 +44,10 @@ var gmApplyRoleCmd = &cobra.Command{
 
 func applyRole(roleFile string) error {
 	// Load configuration from environment variables
-	config := config.Load()
+	cfg := config.Load()
+
+	// Create an instance of database
+	ctx := context.Background()
 
 	// Read roles from file or directory.
 	roles, err := assets.ReadAssets[types.Role](roleFile)
@@ -56,10 +60,12 @@ func applyRole(roleFile string) error {
 		return fmt.Errorf("duplicated roles found: %v", err)
 	}
 
-	// Create an instance of database
-	ctx := context.Background()
+	// Detect roles that doesn't meat prefix criteria.
+	if err := utils.CheckPrefix(roles, cfg[config.DatabaseRolePrefix]); err != nil {
+		return fmt.Errorf("some role names are not satisfy GM_ROLE_PREFIX criteria: %v", err)
+	}
 
-	databaseInstance, err := role.New(ctx, config)
+	databaseInstance, err := role.New(ctx, cfg)
 	if err != nil {
 		return fmt.Errorf("failed to create database instance: %w", err)
 	}

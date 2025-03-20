@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/welibekov/grantmaster/modules/config"
 	"github.com/welibekov/grantmaster/modules/policy/types"
 )
 
@@ -11,9 +12,9 @@ type Policy struct {
 	RolePrefix string
 }
 
-func NewPolicy(config map[string]string) *Policy {
+func NewPolicy(cfg map[string]string) *Policy {
 	return &Policy{
-		RolePrefix: config["GM_DATABASE_ROLE_PREFIX"], // Policy filename prefix from the configuration.
+		RolePrefix: cfg[config.DatabaseRolePrefix], // Policy filename prefix from the configuration.
 	}
 }
 

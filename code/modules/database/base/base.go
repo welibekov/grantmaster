@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/welibekov/grantmaster/modules/config"
 	polTypes "github.com/welibekov/grantmaster/modules/policy/types"
 	rolTypes "github.com/welibekov/grantmaster/modules/role/types"
 )
@@ -12,9 +13,9 @@ type Database struct {
 	RolePrefix string
 }
 
-func NewDatabase(config map[string]string) *Database {
+func NewDatabase(cfg map[string]string) *Database {
 	return &Database{
-		RolePrefix: config["GM_DATABASE_ROLE_PREFIX"], // Role filename prefix from the configuration.
+		RolePrefix: cfg[config.DatabaseRolePrefix], // Role filename prefix from the configuration.
 	}
 }
 
