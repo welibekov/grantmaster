@@ -141,6 +141,7 @@ main() {
     ;;
 
     spindown)
+      _msg ""
       _msg "Stoping enviroinment..."
       _msg "##########"
 

@@ -1,10 +1,16 @@
 #!/bin/bash
 
-exit 0
+main() {
+  for func in tests/postgres/_functions tests/postgres/policy/_functions; do
+    source "$func"
+  done
+  
+  _gm_prepare_roles || exit 0
 
-TEST_DIR=$(mktemp -d)
+  _load_and_run_tests policy
 
-cat <<'EOF' > $TEST_DIR/policy.yaml
-EOF
+  exit $?
+}
 
-$GM_BIN policy apply --help
+main "$@"
+

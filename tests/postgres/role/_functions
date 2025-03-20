@@ -1,44 +1,13 @@
 #!/bin/bash
 
-export POSTGRES_DOCKER_CONTAINER=${POSTGRES_DOCKER_CONTAINER:-postgres}
-export POSTGRES_USER=${POSTGRES_USER:-dwh}
-export POSTGRES_DATABASE=${POSTGRES_DATABASE:-dwh}
-export GM_DATABASE_TYPE=postgres
-export GM_POSTGRES_CONN_STRING='postgres://dwh:dwh@localhost:5432/dwh'
-
-_exec() {
-  docker exec -ti "$POSTGRES_DOCKER_CONTAINER" "$@"
-}
-
-_psql_read() {
-  _exec cat /root/output
-}
-
-_psql() {
-  _exec psql --output=/root/output -U "$POSTGRES_USER" -d "$POSTGRES_DATABASE" "$@"
-}
-
 _role() {
   $GM_BIN role "$@"
 }
 
-_cmp() {
-  cmp -s "$@"
-}
-
-_get_roles_file() {
+_get_role_file() {
   local num; num=$1
-  
-  mkdir -p "$TEST_DIR/roles/$num"
-  echo $TEST_DIR/roles/$num/roles.yaml
-}
-
-_done() {
-  echo -e "\e[32mdone\e[0m"  
-}
-
-_failed() {
-  echo -e "\e[31mfailed\e[0m"  
+ 
+  _get_type_yaml_file role $num
 }
 
 _compare() {

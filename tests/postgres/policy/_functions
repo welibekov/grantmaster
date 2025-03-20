@@ -1,0 +1,53 @@
+#!/bin/bash
+
+_policy() {
+  $GM_BIN policy "$@"
+}
+
+_get_policy_file() {
+  local num; num=$1
+ 
+  _get_type_yaml_file policy $num
+}
+
+_gm_prepare_roles() {
+  local role_yaml=$(_get_policy_file 0)
+
+  cat <<'EOF' >"$role_yaml"
+- name: dwh_song_read
+  schemas:
+    - schema: song
+      grants:
+        - usage
+- name: dwh_song_write
+  schemas:
+    - schema: song
+      grants:
+        - usage
+        - create
+EOF
+
+  $GM_BIN role apply "$role_yaml" || exit 1
+}
+
+_compare() {
+  local input; input=$1
+  local current; current="$(dirname $input)/get.yaml"
+
+  _policy apply "$input" || exit 1
+  _policy get > "$current" || exit 1
+
+ local exitcode; exitcode=0
+
+ if ! _cmp "$input" "$current"; then
+   exitcode=1
+ fi
+
+ if [[ $exitcode -eq 0 ]]; then
+   _done
+ else
+   _failed
+ fi
+
+ return $exitcode
+}
