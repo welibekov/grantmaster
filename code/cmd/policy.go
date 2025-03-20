@@ -10,6 +10,7 @@ import (
 	"github.com/welibekov/grantmaster/modules/config"
 	"github.com/welibekov/grantmaster/modules/policy"
 	"github.com/welibekov/grantmaster/modules/policy/types"
+	"github.com/welibekov/grantmaster/modules/policy/utils"
 	"gopkg.in/yaml.v3"
 )
 
@@ -42,7 +43,7 @@ var gmApplyPolicyCmd = &cobra.Command{
 
 func applyPolicy(policyFile string) error {
 	// Load configuration from environment variables
-	config := config.Load()
+	cfg := config.Load()
 
 	// Set context
 	ctx := context.Background()
@@ -58,8 +59,13 @@ func applyPolicy(policyFile string) error {
 		return fmt.Errorf("duplicated policies found: %v", err)
 	}
 
+	// Detect roles that doesn't meat prefix criteria.
+	if err := utils.CheckPrefix(policies, cfg[config.DatabaseRolePrefix]); err != nil {
+		return fmt.Errorf("some role names are not satisfy GM_ROLE_PREFIX criteria: %v", err)
+	}
+
 	// Create an instance of database
-	databaseInstance, err := policy.New(ctx, config)
+	databaseInstance, err := policy.New(ctx, cfg)
 	if err != nil {
 		return fmt.Errorf("failed to create database instance: %w", err)
 	}
