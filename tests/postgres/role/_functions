@@ -1,0 +1,33 @@
+#!/bin/bash
+
+_role() {
+  $GM_BIN role "$@"
+}
+
+_get_role_file() {
+  local num; num=$1
+ 
+  _get_type_yaml_file role $num
+}
+
+_compare() {
+  local input; input=$1
+  local current; current="$(dirname $input)/get.yaml"
+
+  _role apply "$input" || exit 1
+  _role get > "$current" || exit 1
+
+ local exitcode; exitcode=0
+
+ if ! _cmp "$input" "$current"; then
+   exitcode=1
+ fi
+
+ if [[ $exitcode -eq 0 ]]; then
+   _done
+ else
+   _failed
+ fi
+
+ return $exitcode
+}

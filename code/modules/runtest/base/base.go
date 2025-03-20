@@ -6,25 +6,27 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/sirupsen/logrus"
+	"github.com/welibekov/grantmaster/modules/types"
 )
 
 type Runtest struct {
-	Tests   []string
-	ExecDir string
+	DatabaseType types.DatabaseType
+	Tests        []string
+	ExecDir      string
 
 	gmBin string
 }
 
-func New(tests []string) (*Runtest, error) {
+func New(dbType types.DatabaseType, tests []string) (*Runtest, error) {
 	gmBin, err := os.Executable()
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get executable: %v", err)
 	}
 
 	return &Runtest{
-		Tests:   tests,
-		ExecDir: filepath.Dir(gmBin),
+		DatabaseType: dbType,
+		Tests:        tests,
+		ExecDir:      filepath.Dir(gmBin),
 
 		gmBin: gmBin,
 	}, nil
@@ -39,17 +41,25 @@ func (r *Runtest) Prepare() (func() error, error) {
 }
 
 func (r *Runtest) Execute() error {
+	gmTestDir, err := os.MkdirTemp(os.TempDir(), fmt.Sprintf("gm-runtest-%s-", r.DatabaseType.ToString()))
+	if err != nil {
+		return fmt.Errorf("couldn't create test directory: %v", err)
+	}
+
 	env := []string{
 		fmt.Sprintf("GM_BIN=%s", r.gmBin),
+		fmt.Sprintf("GM_TEST_DIR=%s", gmTestDir),
 	}
+
+	var testErr error
 
 	for _, test := range r.Tests {
 		if err := r.exec(test, env).Run(); err != nil {
-			logrus.Warnf("test '%s' failed: %v", test, err)
+			testErr = err
 		}
 	}
 
-	return nil
+	return testErr
 }
 
 func (r *Runtest) exec(test string, env []string) *exec.Cmd {

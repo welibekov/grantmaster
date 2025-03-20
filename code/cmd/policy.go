@@ -98,8 +98,8 @@ var gmGetPolicyCmd = &cobra.Command{
 			return fmt.Errorf("couldn't marshal policies: %v", err)
 		}
 
-		fmt.Println(string(yamlBytes))
+		_, err = os.Stdout.Write(yamlBytes)
 
-		return nil
+		return err
 	},
 }

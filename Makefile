@@ -19,10 +19,10 @@ clean:
 	@echo "Cleaning up the bin directory..."
 	@rm -rf $(BIN_DIR)
 
-# Run the application
-run: build
-	@echo "Running the application..."
-	./$(BIN_DIR)/$(BINARY_NAME)
+# Run test (runtest)
+runtest:
+	@echo "Running the runtests..."
+	@GM_DATABASE_TYPE=postgres ./$(BIN_DIR)/$(BINARY_NAME) runtest
 
 # Specify who to ignore
-.PHONY: all build clean run
+.PHONY: all build clean runtest

@@ -1,0 +1,153 @@
+#!/bin/bash
+
+source tests/postgres/role/_functions
+
+_gm_role_test_number_1() {
+  local num; num=$1
+  local role_yaml=$(_get_role_file $num)
+
+  echo -n "Test #$num: add usage,create grants to song schema ... "
+
+  cat <<'EOF' >"$role_yaml"
+- name: dwh_song_read
+  schemas:
+    - schema: song
+      grants:
+        - create
+        - usage
+EOF
+  _compare "$role_yaml"
+}
+
+_gm_role_test_number_2() {
+  local num; num=$1
+  local role_yaml=$(_get_role_file $num)
+
+  echo -n "Test #$num: remove create grant from song schema ... "
+
+  cat <<'EOF' >"$role_yaml"
+- name: dwh_song_read
+  schemas:
+    - schema: song
+      grants:
+        - usage
+EOF
+  _compare "$role_yaml"
+}
+
+_gm_role_test_number_3() {
+  local num; num=$1
+  local role_yaml=$(_get_role_file $num)
+  echo -n "Test #$num: remove usage grant from song schema ... "
+
+  cat <<'EOF' >"$role_yaml"
+- name: dwh_song_read
+  schemas:
+    - schema: song
+      grants:
+EOF
+  _compare "$role_yaml"
+}
+
+_gm_role_test_number_4() {
+  local num; num=$1
+  local role_yaml=$(_get_role_file $num)
+  echo -n "Test #$num: remove whole dwh_song_read role ... "
+
+  cat <<'EOF' >"$role_yaml"
+[]
+EOF
+  _compare "$role_yaml"
+}
+
+_gm_role_test_number_5() {
+  local num; num=$1
+  local role_yaml=$(_get_role_file $num)
+  echo -n "Test #$num: add band,song schemas ... "
+
+  cat <<'EOF' >"$role_yaml"
+- name: dwh_song_read
+  schemas:
+    - schema: band
+      grants:
+        - create
+        - usage
+    - schema: song
+      grants:
+        - usage
+EOF
+  _compare "$role_yaml"
+}
+
+_gm_role_test_number_6() {
+  local num; num=$1
+  local role_yaml=$(_get_role_file $num)
+  echo -n "Test #$num: remove song schema ... "
+
+  cat <<'EOF' >"$role_yaml"
+- name: dwh_song_read
+  schemas:
+    - schema: band
+      grants:
+        - create
+        - usage
+EOF
+  _compare "$role_yaml"
+}
+
+_gm_role_test_number_7() {
+  local num; num=$1
+  local role_yaml=$(_get_role_file $num)
+  echo -n "Test #$num: add song schema to existing ... "
+
+  cat <<'EOF' >"$role_yaml"
+- name: dwh_song_read
+  schemas:
+    - schema: band
+      grants:
+        - create
+        - usage
+    - schema: song
+      grants:
+        - create
+        - usage
+EOF
+  _compare "$role_yaml"
+}
+
+_gm_role_test_number_8() {
+  local num; num=$1
+  local role_yaml=$(_get_role_file $num)
+  echo -n "Test #$num: remove create grant from song schema ... "
+
+  cat <<'EOF' >"$role_yaml"
+- name: dwh_song_read
+  schemas:
+    - schema: band
+      grants:
+        - create
+        - usage
+    - schema: song
+      grants:
+        - usage
+EOF
+  _compare "$role_yaml"
+}
+
+_gm_role_test_number_9() {
+  local num; num=$1
+  local role_yaml=$(_get_role_file $num)
+  echo -n "Test #$num: remove usage grant from band schema ... "
+
+  cat <<'EOF' >"$role_yaml"
+- name: dwh_song_read
+  schemas:
+    - schema: band
+      grants:
+        - create
+    - schema: song
+      grants:
+        - usage
+EOF
+  _compare "$role_yaml"
+}

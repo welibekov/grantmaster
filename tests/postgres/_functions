@@ -1,0 +1,84 @@
+#!/bin/bash
+
+export POSTGRES_DOCKER_CONTAINER=${POSTGRES_DOCKER_CONTAINER:-postgres}
+export POSTGRES_USER=${POSTGRES_USER:-dwh}
+export POSTGRES_DATABASE=${POSTGRES_DATABASE:-dwh}
+export GM_DATABASE_TYPE=postgres
+export GM_POSTGRES_CONN_STRING='postgres://dwh:dwh@localhost:5432/dwh'
+
+_exec() {
+  docker exec -ti "$POSTGRES_DOCKER_CONTAINER" "$@"
+}
+
+_psql_read() {
+  _exec cat /root/output
+}
+
+_psql() {
+  _exec psql --output=/root/output -U "$POSTGRES_USER" -d "$POSTGRES_DATABASE" "$@"
+}
+
+_cmp() {
+  cmp -s "$@"
+}
+
+_msg() {
+  echo -n "$*"
+}
+
+_done() {
+  echo -e "\e[32mdone\e[0m"  
+}
+
+_failed() {
+  echo -e "\e[31mfailed\e[0m"  
+}
+
+_get_type_yaml_file() {
+  local typ; typ=$1
+  local num; num=$2
+  
+  mkdir -p "$GM_TEST_DIR/$typ/$num"
+  echo $GM_TEST_DIR/$typ/$num/${typ}.yaml
+
+}
+
+_preambula() {
+  local typ; typ=$1
+  cat <<EOF
+
++---------------------------------------
+|
+|   Starting $typ tests         
+|   Results are under: 
+|        
+|   $GM_TEST_DIR/$typ
+|                            
++---------------------------------------
+
+EOF
+}
+
+_load_and_run_tests() {
+  local typ; typ=$1
+
+  source tests/postgres/$typ/_tests
+
+  _preambula $typ
+
+  local exitcode; exitcode=0
+
+  tests=()
+  
+  while IFS= read -r test; do
+    tests+=("$test")
+  done <<<$(declare -F | grep -Eo "_gm_${typ}_test_number_[0-9]{1,}")
+
+  for test_name in "${tests[@]}"; do
+    local num; num=${test_name##*_}
+
+    "$test_name" "$num" || exitcode=1
+  done
+  
+  return $exitcode
+}

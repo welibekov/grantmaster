@@ -8,8 +8,8 @@ import (
 	"github.com/welibekov/grantmaster/modules/types"
 )
 
-func New(config map[string]string, tests []string) (databaser.RunTesterer, error) {
-	switch dbType := types.DatabaseType(config["GM_DATABASE_TYPE"]); dbType {
+func New(dbType types.DatabaseType, tests []string) (databaser.RunTesterer, error) {
+	switch dbType {
 	case types.Postgres:
 		return pgRuntest.New(tests)
 	default:
