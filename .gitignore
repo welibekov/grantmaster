@@ -4,3 +4,4 @@ bin
 bin/*
 code/modules/template/assets
 code/modules/template/assets/*
+*.swp
