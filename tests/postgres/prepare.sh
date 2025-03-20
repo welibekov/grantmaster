@@ -5,7 +5,7 @@ export POSTGRES_DOCKER_CONTAINER=${POSTGRES_DOCKER_CONTAINER:-postgres}
 export POSTGRES_USER=${POSTGRES_USER:-dwh}
 export POSTGRES_PASS=${POSTGRES_PASS:-dwh}
 export POSTGRES_DATABASE=${POSTGRES_DATABASE:-dwh}
-export POSTGRES_TEMP_DIR=${POSTGRES_TEMP_DIR:-.}
+export POSTGRES_TEMP_DIR=${POSTGRES_TEMP_DIR:-/tmp}
 export POSTGRES_SERVICE=${POSTGRES_SERVICE:-postgres}
 export POSTGRES_PORT=${POSTGRES_POR:-5432}
 export GM_DATABASE_ROLE_PREFIX=${GM_DATABASE_ROLE_PREFIX:-dwh_}
@@ -63,7 +63,7 @@ EOF
 }
 
 _compose() {
-  docker-compose -f docker-compose.yml "$@"
+  docker-compose -f "$POSTGRES_TEMP_DIR/docker-compose.yml" "$@"
 }
 
 _psql() {
@@ -123,7 +123,7 @@ _spinup() {
 
 _spindown() {
   _compose down -v --remove-orphans && \
-  rm docker-compose.yml
+  rm "$POSTGRES_TEMP_DIR/docker-compose.yml"
 }
 
 main() {

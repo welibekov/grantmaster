@@ -57,7 +57,6 @@ _test_number_4() {
   cat <<'EOF' >"$roles_yaml"
 []
 EOF
-
   _compare "$roles_yaml"
 }
 
@@ -77,7 +76,6 @@ _test_number_5() {
       grants:
         - usage
 EOF
-
   _compare "$roles_yaml"
 }
 
@@ -94,7 +92,6 @@ _test_number_6() {
         - create
         - usage
 EOF
-
   _compare "$roles_yaml"
 }
 
@@ -115,7 +112,6 @@ _test_number_7() {
         - create
         - usage
 EOF
-
   _compare "$roles_yaml"
 }
 
@@ -135,7 +131,6 @@ _test_number_8() {
       grants:
         - usage
 EOF
-
   _compare "$roles_yaml"
 }
 
@@ -154,6 +149,5 @@ _test_number_9() {
       grants:
         - usage
 EOF
-
   _compare "$roles_yaml"
 }

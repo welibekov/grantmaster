@@ -14,6 +14,8 @@ main() {
 //                             //
 /////////////////////////////////
 EOF
+  local exitcode; exitcode=0
+
   tests=()
   
   while IFS= read -r test; do
@@ -23,9 +25,9 @@ EOF
   for test_name in "${tests[@]}"; do
     local num; num=${test_name##*_}
 
-    "$test_name" "$num" 
+    "$test_name" "$num" || exitcode=1
   done
-
+  
   cat <<'EOF'
 /////////////////////////////////
 //                             //
@@ -33,6 +35,8 @@ EOF
 //                             //
 /////////////////////////////////
 EOF
+
+  exit $exitcode
 }
 
 main "$@"

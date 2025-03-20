@@ -59,4 +59,6 @@ _compare() {
  else
    _failed
  fi
+
+ return $exitcode
 }

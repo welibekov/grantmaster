@@ -43,13 +43,16 @@ func (r *Runtest) Execute() error {
 		fmt.Sprintf("GM_BIN=%s", r.gmBin),
 	}
 
+	var testErr error
+
 	for _, test := range r.Tests {
 		if err := r.exec(test, env).Run(); err != nil {
 			logrus.Warnf("test '%s' failed: %v", test, err)
+			testErr = err
 		}
 	}
 
-	return nil
+	return testErr
 }
 
 func (r *Runtest) exec(test string, env []string) *exec.Cmd {
