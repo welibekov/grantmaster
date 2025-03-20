@@ -5,8 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-
-	"github.com/sirupsen/logrus"
 )
 
 type Runtest struct {
@@ -39,15 +37,20 @@ func (r *Runtest) Prepare() (func() error, error) {
 }
 
 func (r *Runtest) Execute() error {
+	gmTestDir, err := os.MkdirTemp(os.TempDir(), "gm-runtest-")
+	if err != nil {
+		return fmt.Errorf("couldn't create test directory: %v", err)
+	}
+
 	env := []string{
 		fmt.Sprintf("GM_BIN=%s", r.gmBin),
+		fmt.Sprintf("GM_TEST_DIR=%s", gmTestDir),
 	}
 
 	var testErr error
 
 	for _, test := range r.Tests {
 		if err := r.exec(test, env).Run(); err != nil {
-			logrus.Warnf("test '%s' failed: %v", test, err)
 			testErr = err
 		}
 	}

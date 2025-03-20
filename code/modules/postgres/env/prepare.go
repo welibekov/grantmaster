@@ -7,11 +7,6 @@ import (
 )
 
 func Prepare(execDir string) (func() error, error) {
-	//tempDir, err := os.MkdirTemp(os.TempDir(), "runtest-postgres-")
-	//if err != nil {
-	//	return fmt.Errorf("couldn't create temporary directory: %v", err)
-	//}
-
 	run := filepath.Join(filepath.Dir(execDir), "tests/postgres/prepare.sh")
 	spinUp := run + " spinup"
 	spinDown := run + " spindown"
