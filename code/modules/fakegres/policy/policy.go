@@ -9,27 +9,32 @@ import (
 	"github.com/welibekov/grantmaster/modules/policy/base"
 )
 
+// FGPolicy represents the policy specific to the Fakegres service.
+// It embeds the base.Policy struct to inherit its fields and methods.
 type FGPolicy struct {
-	*base.Policy
+	*base.Policy // Embedding the base policy for shared functionality
 
 	rootDir   string // Directory where fakegres data is stored
 	policyDir string // Directory where policy files are stored
 }
 
+// New initializes a new FGPolicy instance with the provided configuration.
+// It sets up the necessary directories and checks for their existence.
 func New(cfg map[string]string) (*FGPolicy, error) {
-	// Initialize a FGPolicy instance with the appropriate directory paths.
+	// Create a new instance of FGPolicy and initialize its fields.
 	fgPol := &FGPolicy{
-		Policy: base.NewPolicy(cfg),
+		Policy: base.NewPolicy(cfg), // Create a new base policy
 
 		// Retrieve the root directory from the configuration or set a default.
-		rootDir:   utils.GetRootDir(cfg),
+		rootDir:   utils.GetRootDir(cfg), // Get the root directory
 		policyDir: filepath.Join(utils.GetRootDir(cfg), "policy"), // Full path to the policy directory.
 	}
 
-	// Check if the specified root directory exists and create necessary subdirectories.
+	// Check if the specified policy directory exists and create it if it doesn't.
 	if err := assets.CreateDir(fgPol.policyDir); err != nil {
 		return nil, fmt.Errorf("couldn't create directory %s: %v", fgPol.policyDir, err)
 	}
 
+	// Return the new FGPolicy instance if no errors occurred.
 	return fgPol, nil
 }
