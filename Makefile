@@ -22,7 +22,7 @@ clean:
 # Run test (runtest)
 runtest:
 	@echo "Running the runtests..."
-	@GM_DATABASE_TYPE=postgres ./$(BIN_DIR)/$(BINARY_NAME) runtest
+	./$(BIN_DIR)/$(BINARY_NAME) runtest
 
 # Specify who to ignore
 .PHONY: all build clean runtest
