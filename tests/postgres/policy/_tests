@@ -15,3 +15,21 @@ EOF
   _compare "$policy_yaml"
 }
 
+_gm_policy_test_number_2() {
+  local num; num=$1
+  local policy_yaml=$(_get_policy_file $num)
+
+  _msg "Test #$num: add dwh_song_read role to david ... "
+
+  cat <<'EOF' >"$policy_yaml"
+- username: jimi
+  roles:
+    - dwh_song_read
+    - dwh_song_write
+- username: david
+  roles:
+    - dwh_song_read
+EOF
+  _compare "$policy_yaml"
+}
+

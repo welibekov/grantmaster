@@ -18,6 +18,7 @@ func init() {
 	rootCmd.AddCommand(gmPolicyCmd)
 	gmPolicyCmd.AddCommand(gmApplyPolicyCmd)
 	gmPolicyCmd.AddCommand(gmGetPolicyCmd)
+	gmPolicyCmd.AddCommand(gmEqualPolicyCmd)
 }
 
 var gmPolicyCmd = &cobra.Command{
@@ -101,5 +102,36 @@ var gmGetPolicyCmd = &cobra.Command{
 		_, err = os.Stdout.Write(yamlBytes)
 
 		return err
+	},
+}
+
+// Define the command to compute the difference between two sets of roles
+var gmEqualPolicyCmd = &cobra.Command{
+	Use:   "equal",                      // Command usage
+	Short: "Find two policies equality", // Short description of command functionality
+	RunE: func(cmd *cobra.Command, args []string) error {
+		// Ensure exactly two arguments are provided
+		if len(args) != 2 {
+			return fmt.Errorf("please provide two role file paths") // Return an error if the count of arguments is incorrect
+		}
+
+		// Read the first set of policies from the specified file or directory
+		policiesFirst, err := assets.ReadAssets[types.Policy](args[0])
+		if err != nil {
+			return fmt.Errorf("couldn't read policies from first file: %v", err) // Return error if reading the first policies fails
+		}
+
+		// Read the second set of policies from the specified file or directory
+		policiesSecond, err := assets.ReadAssets[types.Policy](args[1])
+		if err != nil {
+			return fmt.Errorf("couldn't read policies from second file: %v", err) // Return error if reading the second policies fails
+		}
+
+		// Compare the two sets of policies for equality
+		if !utils.Equal(policiesFirst, policiesSecond) {
+			os.Exit(1) // Exit with a non-zero status if the policies differ
+		}
+
+		return nil // Return nil if policies are equal
 	},
 }

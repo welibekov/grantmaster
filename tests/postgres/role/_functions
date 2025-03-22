@@ -10,6 +10,10 @@ _get_role_file() {
   _get_type_yaml_file role $num
 }
 
+_equal() {
+  _role equal "$@"
+}
+
 _compare() {
   local input; input=$1
   local current; current="$(dirname $input)/get.yaml"
@@ -19,8 +23,10 @@ _compare() {
 
  local exitcode; exitcode=0
 
- if ! _cmp "$input" "$current"; then
+ if ! _equal "$input" "$current"; then
    exitcode=1
+
+   diff "$input" "$current"
  fi
 
  if [[ $exitcode -eq 0 ]]; then

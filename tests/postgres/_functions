@@ -18,10 +18,6 @@ _psql() {
   _exec psql --output=/root/output -U "$POSTGRES_USER" -d "$POSTGRES_DATABASE" "$@"
 }
 
-_cmp() {
-  cmp -s "$@"
-}
-
 _msg() {
   echo -n "$*"
 }
@@ -82,3 +78,4 @@ _load_and_run_tests() {
   
   return $exitcode
 }
+
