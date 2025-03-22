@@ -10,18 +10,18 @@ import (
 // Equal checks if two slices of roles are equal.
 // It normalizes both slices and compares them using reflect.DeepEqual.
 func Equal(roleA, roleB []types.Role) bool {
-	roleAMap := normalizeRoles(roleA)
-	roleBMap := normalizeRoles(roleB)
+	roleA = normalizeRoles(roleA)
+	roleB = normalizeRoles(roleB)
 
 	// Use DeepEqual to determine if both normalized role slices are identical.
-	return reflect.DeepEqual(roleAMap, roleBMap)
+	return reflect.DeepEqual(roleA, roleB)
 }
 
 // normalizeRoles takes a slice of roles and normalizes them for comparison.
 // It sorts the Schemas of each role by Schema name and
 // sorts the Grants within each Schema.
 func normalizeRoles(roles []types.Role) []types.Role {
-	roleMaps := []types.Role{}
+	rolesSorted := []types.Role{}
 
 	for _, role := range roles {
 		// Sort Schemas by Schema name for consistency in comparison.
@@ -35,9 +35,9 @@ func normalizeRoles(roles []types.Role) []types.Role {
 		}
 
 		// Append the normalized role to the list of roleMaps.
-		roleMaps = append(roleMaps, role)
+		rolesSorted = append(rolesSorted, role)
 	}
 
 	// Return the normalized list of roles.
-	return roleMaps
+	return rolesSorted
 }
