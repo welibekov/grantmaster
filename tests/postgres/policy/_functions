@@ -39,7 +39,7 @@ _compare() {
 
  local exitcode; exitcode=0
 
- if ! _cmp "$input" "$current"; then
+ if ! _diff_yaml "$input" "$current"; then
    exitcode=1
  fi
 
