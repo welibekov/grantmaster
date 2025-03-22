@@ -30,6 +30,10 @@ EOF
   $GM_BIN role apply "$role_yaml" || exit 1
 }
 
+_equal() {
+  _policy equal "$@"
+}
+
 _compare() {
   local input; input=$1
   local current; current="$(dirname $input)/get.yaml"
@@ -39,7 +43,7 @@ _compare() {
 
  local exitcode; exitcode=0
 
- if ! _diff_yaml "$input" "$current"; then
+ if ! _equal "$input" "$current"; then
    exitcode=1
  fi
 

@@ -79,10 +79,3 @@ _load_and_run_tests() {
   return $exitcode
 }
 
-_diff_yaml() {
-  local first; first=$1
-  local second; second=$2
-
-  diff <(yq -o=json 'sort_keys(..) | .. |= (select(tag == "!!seq") |= sort_by(.schema // .))' "$first") \
-     <(yq -o=json 'sort_keys(..) | .. |= (select(tag == "!!seq") |= sort_by(.schema // .))' "$second")
-}
