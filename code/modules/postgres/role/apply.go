@@ -25,6 +25,7 @@ func (p *PGRole) Apply(ctx context.Context, roles []types.Role) error {
 
 	debug.OutputMarshal(grantRoles, "roles to grant")
 	debug.OutputMarshal(revokeRoles, "roles to revoke")
+	debug.OutputMarshal(revokeRoles, "roles to drop")
 
 	if len(grantRoles) > 0 {
 		if err := p.Grant(ctx, grantRoles); err != nil {
