@@ -12,16 +12,26 @@ func (p *PGRole) Drop(ctx context.Context, roles []types.Role) error {
 	var query string
 
 	for _, role := range roles {
+		exist, err := p.IsRoleExist(ctx, role)
+		if err != nil {
+			return fmt.Errorf("couldn't check if role %s exist: %v", role.Name, err)
+		}
+
+		if !exist { // don't try to revoke and drop grants on non-existing role
+			continue
+		}
+
 		for _, schema := range role.Schemas {
 			query += fmt.Sprintf("REVOKE ALL PRIVILEGES ON SCHEMA %s FROM %s;", schema.Schema, role.Name)
 			query += fmt.Sprintf("REVOKE GRANT OPTION FOR ALL PRIVILEGES ON SCHEMA %s FROM %s;", schema.Schema, role.Name)
 			query += fmt.Sprintf("REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA %s FROM %s;", schema.Schema, role.Name)
 			query += fmt.Sprintf("REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA %s FROM %s;", schema.Schema, role.Name)
-			query += fmt.Sprintf("DROP ROLE %s;", role.Name)
 		}
-	}
 
-	logrus.Debugln(query) // Log the generated query for debugging purposes
+		query += fmt.Sprintf("DROP ROLE %s;", role.Name)
+
+		logrus.Debugln(query) // Log the generated query for debugging purposes
+	}
 
 	_, err := p.pool.Exec(ctx, query)
 	if err != nil {
