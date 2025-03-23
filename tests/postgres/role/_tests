@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source tests/postgres/role/_functions
-
 _gm_role_test_number_1() {
   local num; num=$1
   local role_yaml=$(_get_role_file $num)
