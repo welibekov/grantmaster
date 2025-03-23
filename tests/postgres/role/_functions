@@ -21,7 +21,7 @@ _compare() {
   local current; current="$(dirname $input)/get.yaml"
   local exitcode; exitcode=0
 
-  _role apply "$input" || exit 1
+  _role apply "$input" &>/dev/null || exit 1
   _role get > "$current" || exit 1
 
   # check if compare_with is not empty then use it

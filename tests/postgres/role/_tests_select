@@ -1,0 +1,75 @@
+#!/bin/bash
+
+_gm_role_test_number_12() {
+  local num; num=$1
+  local role_yaml=$(_get_role_file $num)
+  echo -n "Test #$num: add select grant for band schema (no tables) ... "
+
+  cat <<'EOF' >"$role_yaml"
+- name: dwh_song_read
+  schemas:
+    - schema: band
+      grants:
+        - create
+        - select
+    - schema: song
+      grants:
+        - usage
+EOF
+
+  # select grant will not applied becase
+  # there is no tables in schema.
+  local _runtest_compare_with;
+  _runtest_compare_with=$(dirname "$role_yaml")/compare_with.yaml
+
+  cat <<'EOF'> "$_runtest_compare_with"
+- name: dwh_song_read
+  schemas:
+    - schema: band
+      grants:
+        - create
+    - schema: song
+      grants:
+        - usage
+EOF
+
+  _compare "$role_yaml" "$_runtest_compare_with"
+}
+
+_gm_role_test_number_13() {
+  local num; num=$1
+  local role_yaml=$(_get_role_file $num)
+  echo -n "Test #$num: add select grant for band schema (with tables) ... "
+
+  cat <<'EOF' >"$role_yaml"
+- name: dwh_song_read
+  schemas:
+    - schema: band
+      grants:
+        - create
+        - select
+    - schema: song
+      grants:
+        - usage
+EOF
+
+  # select grant will only visible for existing table in schema,
+  # so we are creating it in advanced.
+  _psql -c "
+CREATE TABLE band.test (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL
+);
+"
+
+  _psql -c "
+INSERT INTO band.test (name) VALUES
+('PinkFloyd'),
+('KingCrimson'),
+('DoubleTrouble');
+"
+
+  _compare "$role_yaml"
+}
+
+

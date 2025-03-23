@@ -3,7 +3,7 @@
 _gm_role_test_number_10() {
   local num; num=$1
   local role_yaml=$(_get_role_file $num)
-  echo -n "Test #$num: remove usage grant from band schema ... "
+  echo -n "Test #$num: add roles with multiple schemas ... "
 
   cat <<'EOF' >"$role_yaml"
 - name: dwh_song_read
@@ -31,7 +31,7 @@ EOF
 _gm_role_test_number_11() {
   local num; num=$1
   local role_yaml=$(_get_role_file $num)
-  echo -n "Test #$num: remove usage grant from band schema ... "
+  echo -n "Test #$num: remove roles with multiple schemas ... "
 
   cat <<'EOF' >"$role_yaml"
 []
