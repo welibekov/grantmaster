@@ -58,7 +58,9 @@ EOF
 _load_and_run_tests() {
   local typ; typ=$1
 
-  source tests/postgres/$typ/_tests
+  while read -r runtest; do
+    source "$runtest"
+  done <<<"$(find tests/postgres/$typ -type f -name _tests*)"
 
   _preambula $typ
 
@@ -68,7 +70,7 @@ _load_and_run_tests() {
   
   while IFS= read -r test; do
     tests+=("$test")
-  done <<<$(declare -F | grep -Eo "_gm_${typ}_test_number_[0-9]{1,}")
+  done <<<$(declare -F | grep -Eo "_gm_${typ}_test_number_[0-9]{1,}" | sort -V)
 
   for test_name in "${tests[@]}"; do
     local num; num=${test_name##*_}

@@ -38,6 +38,10 @@ func normalizeRoles(roles []types.Role) []types.Role {
 		rolesSorted = append(rolesSorted, role)
 	}
 
+	sort.Slice(rolesSorted, func(i, j int) bool {
+		return rolesSorted[i].Name < rolesSorted[j].Name
+	})
+
 	// Return the normalized list of roles.
 	return rolesSorted
 }

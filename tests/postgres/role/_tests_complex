@@ -1,0 +1,40 @@
+#!/bin/bash
+
+_gm_role_test_number_10() {
+  local num; num=$1
+  local role_yaml=$(_get_role_file $num)
+  echo -n "Test #$num: add roles with multiple schemas ... "
+
+  cat <<'EOF' >"$role_yaml"
+- name: dwh_song_read
+  schemas:
+    - schema: band
+      grants:
+        - create
+    - schema: song
+      grants:
+        - usage
+- name: dwh_song_write
+  schemas:
+    - schema: band
+      grants:
+        - create
+- name: dwh_lyrics_write
+  schemas:
+    - schema: band
+      grants:
+        - create
+EOF
+  _compare "$role_yaml"
+}
+
+_gm_role_test_number_11() {
+  local num; num=$1
+  local role_yaml=$(_get_role_file $num)
+  echo -n "Test #$num: remove roles with multiple schemas ... "
+
+  cat <<'EOF' >"$role_yaml"
+[]
+EOF
+  _compare "$role_yaml"
+}
