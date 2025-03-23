@@ -32,6 +32,7 @@ _gm_role_test_number_2() {
       grants:
         - usage
 EOF
+
   _compare "$role_yaml"
 }
 
@@ -46,7 +47,13 @@ _gm_role_test_number_3() {
     - schema: song
       grants:
 EOF
-  _compare "$role_yaml"
+
+  local _runtest_compare_with;
+  _runtest_compare_with=$(dirname "$role_yaml")/compare_with.yaml
+
+  echo '[]' > "$_runtest_compare_with"
+
+  _compare "$role_yaml" "$_runtest_compare_with"
 }
 
 _gm_role_test_number_4() {
