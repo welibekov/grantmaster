@@ -25,6 +25,17 @@ _gm_prepare_roles() {
       grants:
         - usage
         - create
+- name: dwh_band_read
+  schemas:
+    - schema: band
+      grants:
+        - usage
+- name: dwh_band_write
+  schemas:
+    - schema: band
+      grants:
+        - usage
+        - create
 EOF
 
   $GM_BIN role apply "$role_yaml" || exit 1
