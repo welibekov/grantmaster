@@ -39,7 +39,7 @@ func normalizeRoles(roles []types.Role) []types.Role {
 	}
 
 	sort.Slice(rolesSorted, func(i, j int) bool {
-		return rolesSorted[i].Name < roles[j].Name
+		return rolesSorted[i].Name < rolesSorted[j].Name
 	})
 
 	// Return the normalized list of roles.
