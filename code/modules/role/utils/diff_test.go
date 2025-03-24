@@ -10,11 +10,12 @@ import (
 
 // TestDiff tests the Diff function which is the public interface.
 func TestDiff(t *testing.T) {
+	// Define test cases for diffing roles.
 	tests := []struct {
-		name     string
-		roles    []types.Role
-		input    []types.Role
-		expected []types.Role
+		name     string      // test case name
+		roles    []types.Role // original roles
+		input    []types.Role // roles to compare against
+		expected []types.Role // expected result of diff operation
 	}{
 		{
 			name: "No differences",
@@ -52,19 +53,23 @@ func TestDiff(t *testing.T) {
 		},
 	}
 
+	// Run each test case
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := Diff(tt.roles, tt.input)
 
+			// If both result and expected are nil or empty, they are considered equal.
 			if result == nil && len(tt.expected) == 0 {
 				return
 			}
 
+			// Compare the result with the expected output.
 			equal, err := utils.Equal(result, tt.expected)
 			if err != nil {
 				log.Fatal("couldn't compare to slices")
 			}
 
+			// If not equal, report the difference.
 			if !equal {
 				t.Errorf("Diff() = %v; want %v", result, tt.expected)
 			}
@@ -74,12 +79,12 @@ func TestDiff(t *testing.T) {
 
 // TestDiffRoles tests the diffRoles function directly.
 func TestDiffRoles(t *testing.T) {
-	// Simulating test data
+	// Simulating test data for role comparisons
 	tests := []struct {
-		name     string
-		first    []types.Role
-		second   []types.Role
-		expected []types.Role
+		name     string      // test case name
+		first    []types.Role // first slice of roles
+		second   []types.Role // second slice of roles for comparison
+		expected []types.Role // expected result of the diff operation
 	}{
 		{
 			name: "Simply missing roles",
@@ -109,19 +114,23 @@ func TestDiffRoles(t *testing.T) {
 		},
 	}
 
+	// Run each test case.
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := diffRoles(tt.first, tt.second)
 
+			// If both result and expected are nil or empty, they are considered equal.
 			if result == nil && len(tt.expected) == 0 {
 				return
 			}
 
+			// Compare the result with the expected output.
 			equal, err := utils.Equal(result, tt.expected)
 			if err != nil {
 				log.Fatal("couldn't compare to slices")
 			}
 
+			// If not equal, report the difference.
 			if !equal {
 				t.Errorf("diffRoles() = %v; want %v", result, tt.expected)
 			}
@@ -131,11 +140,12 @@ func TestDiffRoles(t *testing.T) {
 
 // TestDiffSchemas tests the diffSchemas function directly.
 func TestDiffSchemas(t *testing.T) {
+	// Define test cases for diffing schemas.
 	tests := []struct {
-		name     string
-		first    []types.Schema
-		second   []types.Schema
-		expected []types.Schema
+		name     string       // test case name
+		first    []types.Schema // first slice of schemas
+		second   []types.Schema // second slice of schemas for comparison
+		expected []types.Schema // expected result of the diff operation
 	}{
 		{
 			name: "Simply missing schemas",
@@ -165,19 +175,23 @@ func TestDiffSchemas(t *testing.T) {
 		},
 	}
 
+	// Run each test case.
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := diffSchemas(tt.first, tt.second)
 
+			// If both result and expected are nil or empty, they are considered equal.
 			if result == nil && len(tt.expected) == 0 {
 				return
 			}
 
+			// Compare the result with the expected output.
 			equal, err := utils.Equal(result, tt.expected)
 			if err != nil {
 				log.Fatal("couldn't compare to slices")
 			}
 
+			// If not equal, report the difference.
 			if !equal {
 				t.Errorf("diffSchemas() = %v; want %v", result, tt.expected)
 			}
@@ -187,11 +201,12 @@ func TestDiffSchemas(t *testing.T) {
 
 // TestDiffGrants tests the diffGrants function directly.
 func TestDiffGrants(t *testing.T) {
+	// Define test cases for diffing grants.
 	tests := []struct {
-		name     string
-		first    []string
-		second   []string
-		expected []string
+		name     string   // test case name
+		first    []string // first slice of grants
+		second   []string // second slice of grants for comparison
+		expected []string // expected result of the diff operation
 	}{
 		{
 			name:     "Missing grants",
@@ -213,19 +228,23 @@ func TestDiffGrants(t *testing.T) {
 		},
 	}
 
+	// Run each test case.
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := diffGrants(tt.first, tt.second)
 
+			// If both result and expected are nil or empty, they are considered equal.
 			if result == nil && len(tt.expected) == 0 {
 				return
 			}
 
+			// Compare the result with the expected output.
 			equal, err := utils.Equal(result, tt.expected)
 			if err != nil {
 				log.Fatal("couldn't compare to slices")
 			}
 
+			// If not equal, report the difference.
 			if !equal {
 				t.Errorf("diffGrants() = %v; want %v", result, tt.expected)
 			}
