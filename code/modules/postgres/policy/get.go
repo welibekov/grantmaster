@@ -16,15 +16,13 @@ func (p *PGPolicy) Get(ctx context.Context) ([]types.Policy, error) {
 	policies := make([]types.Policy, 0)
 
 	// SQL query to fetch usernames and their associated roles.
-	query := `
-SELECT u.usename
-AS username, r.rolname
-AS role
+	query := fmt.Sprintf(`
+SELECT u.usename AS username, r.rolname AS role
 FROM pg_user u
-JOIN pg_auth_members m
-ON u.usesysid = m.member
-JOIN pg_roles r
-ON m.roleid = r.oid;`
+JOIN pg_auth_members m ON u.usesysid = m.member
+JOIN pg_roles r ON m.roleid = r.oid
+WHERE r.rolname LIKE '%s%%';
+`, p.RolePrefix)
 
 	// Execute the query.
 	rows, err := p.pool.Query(ctx, query)
