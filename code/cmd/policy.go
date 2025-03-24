@@ -38,7 +38,7 @@ var gmApplyPolicyCmd = &cobra.Command{
 	Short: "Apply policies from the specified YAML file or directory",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {
-			return fmt.Errorf("role.yaml file or directory not provided")
+			return fmt.Errorf("policy.yaml file or directory not provided")
 		}
 
 		return applyPolicy(args[0])
