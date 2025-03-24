@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/sirupsen/logrus"
 	"github.com/welibekov/grantmaster/modules/policy/types"
 )
 
@@ -23,6 +24,8 @@ JOIN pg_auth_members m ON u.usesysid = m.member
 JOIN pg_roles r ON m.roleid = r.oid
 WHERE r.rolname LIKE '%s%%';
 `, p.RolePrefix)
+
+	logrus.Debugln("policy get query:", query)
 
 	// Execute the query.
 	rows, err := p.pool.Query(ctx, query)

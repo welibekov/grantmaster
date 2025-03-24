@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/sirupsen/logrus"
 	"github.com/welibekov/grantmaster/modules/role/types"
 )
 
@@ -27,7 +28,7 @@ WITH granted_table_permissions AS (
     FROM information_schema.role_table_grants
     WHERE table_schema NOT LIKE 'pg_%%'
     AND table_schema NOT IN ('information_schema', 'public')
-    AND grantee LIKE '%s_%%'
+    AND grantee LIKE '%s%%'
 ),
 all_table_permissions AS (
     SELECT 
@@ -108,6 +109,8 @@ LEFT JOIN (
     AND ap.permission_name = gp.permission_name
 ORDER BY ap.role_or_user, ap.schema_name, ap.permission_name;
 `, p.Prefix, p.Prefix, p.Prefix, p.Prefix, p.Prefix)
+
+	logrus.Debugln("role get query:", query)
 
 	rows, err := p.pool.Query(ctx, query)
 	if err != nil {
