@@ -16,7 +16,8 @@ func (p *PGRole) Get(ctx context.Context) ([]types.Role, error) {
 	// Slice to hold the resulting roles.
 	roles := make([]types.Role, 0)
 
-	query := `
+	// Get roles with specific role prefix.
+	query := fmt.Sprintf(`
 WITH granted_table_permissions AS (
     SELECT 
         grantee AS role_or_user,
@@ -24,9 +25,9 @@ WITH granted_table_permissions AS (
         privilege_type AS permission_name,
         'YES' AS has_access
     FROM information_schema.role_table_grants
-    WHERE table_schema NOT LIKE 'pg_%'
+    WHERE table_schema NOT LIKE 'pg_%%'
     AND table_schema NOT IN ('information_schema', 'public')
-    AND grantee LIKE 'dwh_%'
+    AND grantee LIKE '%s_%%'
 ),
 all_table_permissions AS (
     SELECT 
@@ -38,9 +39,9 @@ all_table_permissions AS (
     JOIN pg_namespace n ON c.relnamespace = n.oid
     CROSS JOIN pg_roles r
     WHERE c.relkind IN ('r', 'v', 'm')  
-    AND n.nspname NOT LIKE 'pg_%'
+    AND n.nspname NOT LIKE 'pg_%%'
     AND n.nspname NOT IN ('information_schema', 'public')
-    AND r.rolname LIKE 'dwh_%'
+    AND r.rolname LIKE '%s%%'
 ),
 granted_schema_permissions AS (
     -- Explicitly checking USAGE privilege
@@ -54,9 +55,9 @@ granted_schema_permissions AS (
         END AS has_access
     FROM pg_namespace n
     CROSS JOIN pg_roles r
-    WHERE n.nspname NOT LIKE 'pg_%'
+    WHERE n.nspname NOT LIKE 'pg_%%'
     AND n.nspname NOT IN ('information_schema', 'public')
-    AND r.rolname LIKE 'dwh_%'
+    AND r.rolname LIKE '%s%%'
 
     UNION ALL
 
@@ -71,9 +72,9 @@ granted_schema_permissions AS (
         END AS has_access
     FROM pg_namespace n
     CROSS JOIN pg_roles r
-    WHERE n.nspname NOT LIKE 'pg_%'
+    WHERE n.nspname NOT LIKE 'pg_%%'
     AND n.nspname NOT IN ('information_schema', 'public')
-    AND r.rolname LIKE 'dwh_%'
+    AND r.rolname LIKE '%s%%'
 ),
 all_schema_permissions AS (
     SELECT 
@@ -83,9 +84,9 @@ all_schema_permissions AS (
         'NO' AS has_access
     FROM pg_namespace n
     CROSS JOIN pg_roles r
-    WHERE n.nspname NOT LIKE 'pg_%'
+    WHERE n.nspname NOT LIKE 'pg_%%'
     AND n.nspname NOT IN ('information_schema', 'public')
-    AND r.rolname LIKE 'dwh_%'
+    AND r.rolname LIKE '%s%%'
 )
 SELECT 
     ap.role_or_user,
@@ -106,7 +107,8 @@ LEFT JOIN (
     AND ap.schema_name = gp.schema_name
     AND ap.permission_name = gp.permission_name
 ORDER BY ap.role_or_user, ap.schema_name, ap.permission_name;
-`
+`, p.Prefix, p.Prefix, p.Prefix, p.Prefix, p.Prefix)
+
 	rows, err := p.pool.Query(ctx, query)
 	if err != nil {
 		// Wrap the error to include context about where it occurred.
