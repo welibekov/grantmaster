@@ -31,6 +31,7 @@ func (f *FGPolicy) Apply(_ context.Context, policies []types.Policy) error {
 	// Remove revoked policies from the file system.
 	err = fgUtils.Remove[types.Policy](revokePolicies,
 		func(item types.Policy) string {
+			// Construct the file path for the policy item using its Username.
 			return filepath.Join(f.policyDir, item.Username)
 		})
 
@@ -41,6 +42,7 @@ func (f *FGPolicy) Apply(_ context.Context, policies []types.Policy) error {
 	// Save the new set of policies to the file system.
 	err = fgUtils.Save(policies,
 		func(item types.Policy) string {
+			// Construct the file path for the policy item using its Username.
 			return filepath.Join(f.policyDir, item.Username)
 		})
 
@@ -48,5 +50,5 @@ func (f *FGPolicy) Apply(_ context.Context, policies []types.Policy) error {
 		return fmt.Errorf("couldn't save policies: %v", err)
 	}
 
-	return nil // Return nil if everything went smooth.
+	return nil // Return nil if everything went smoothly.
 }

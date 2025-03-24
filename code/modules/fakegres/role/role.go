@@ -24,9 +24,9 @@ func New(cfg map[string]string) (*FGRole, error) {
 		Role: base.NewRole(cfg), // Create a new base Role using the provided configuration.
 
 		// Retrieve the root directory from the configuration or set a default.
-		rootDir: utils.GetRootDir(cfg),
+		rootDir: utils.GetRootDir(cfg), // Get the root directory from the config.
 		// Full path to the role directory under the root directory.
-		roleDir: filepath.Join(utils.GetRootDir(cfg), "role"),
+		roleDir: filepath.Join(utils.GetRootDir(cfg), "role"), // Construct the role directory path.
 	}
 
 	// Check if the specified role directory exists; if not, create it.

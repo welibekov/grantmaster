@@ -9,10 +9,10 @@ var (
 // GetRootDir retrieves the root directory from the provided configuration map.
 // If the key for the root directory is not found, it returns a default value.
 func GetRootDir(cfg map[string]string) string {
-	// Retrieve the root directory from the configuration or set a default.
+	// Attempt to retrieve the root directory from the configuration map.
 	rootDir, found := cfg[FakegresRootDir]
 	if !found {
-		rootDir = DefaultFakegresRootDir // Set to default value if not found.
+		rootDir = DefaultFakegresRootDir // Set to the default value if the key is not present in the configuration.
 	}
 
 	return rootDir // Return the determined root directory.

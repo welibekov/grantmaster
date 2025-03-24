@@ -14,24 +14,24 @@ import (
 func Save[T any](items []T, getPath func(item T) string) error {
 	// Check if there are any items to save
 	if len(items) > 0 {
-		// Iterate over each item
+		// Iterate over each item in the provided slice
 		for _, item := range items {
-			// Get the file path based on item
+			// Get the file path based on the item using the provided getPath function
 			path := getPath(item)
 
-			// Ensure the file has a .yaml extension
-			if !strings.HasPrefix(path, ".yaml") {
+			// Ensure the file path has a .yaml extension
+			if !strings.HasSuffix(path, ".yaml") {
 				path += ".yaml"
 			}
 
-			// Serialize the item to YAML format
+			// Serialize the current item to YAML format
 			yamlBytes, err := yaml.Marshal(item)
 			if err != nil {
-				// Return an error if marshalling fails, wrapped with context
+				// Return an error if marshalling fails, wrapped with contextual information
 				return fmt.Errorf("failed to marshal item: %w", err)
 			}
 
-			// Write the serialized YAML bytes to a file
+			// Write the serialized YAML bytes to a file at the specified path
 			if err := ioutil.WriteFile(path, yamlBytes, 0644); err != nil {
 				// Return an error if writing the file fails, with contextual information
 				return fmt.Errorf("couldn't save data for %s: %v", path, err)

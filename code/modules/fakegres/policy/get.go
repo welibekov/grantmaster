@@ -26,6 +26,7 @@ func (p *FGPolicy) Get(_ context.Context) ([]types.Policy, error) {
 			}
 
 			// Append the successfully read policy to the slice.
+			// The append function doesn't modify the original slice, so we return a new slice containing the old policies and the new policy.
 			return append(policies, policy), nil
 		})
 
@@ -35,5 +36,6 @@ func (p *FGPolicy) Get(_ context.Context) ([]types.Policy, error) {
 	}
 
 	// Return the slice of policies read from the storage.
+	// At this point, policies contain all successfully read policies from the assets.
 	return policies, nil
 }
