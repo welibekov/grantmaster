@@ -33,7 +33,7 @@ func normalizePolicies(policies []types.Policy) []types.Policy {
 
 	// Sort finally by Username.
 	sort.Slice(sortedPolicies, func(i, j int) bool {
-		return sortedPolicies[i].Username < policies[j].Username
+		return sortedPolicies[i].Username < sortedPolicies[j].Username
 	})
 
 	// Return the slice of policies with sorted Roles.
