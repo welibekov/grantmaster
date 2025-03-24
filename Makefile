@@ -5,6 +5,10 @@ BINARY_NAME = gm
 BIN_DIR = bin
 GOFLAGS = GOOS=linux GOARCH=amd64  # Change as needed for target OS/arch
 
+ifeq ($(GM_DATABASE_TYPE),)
+	GM_DATABASE_TYPE = postgres
+endif
+
 # Default target
 all: build
 
@@ -21,8 +25,8 @@ clean:
 
 # Run test (runtest)
 runtest:
-	@echo "Running the runtests..."
-	./$(BIN_DIR)/$(BINARY_NAME) runtest
+	@echo "Running the runtests for $(GM_DATABASE_TYPE) ..."
+	./$(BIN_DIR)/$(BINARY_NAME) $(GM_DATABASE_TYPE) runtest
 
 # Specify who to ignore
 .PHONY: all build clean runtest

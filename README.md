@@ -54,9 +54,7 @@ make runtest
 
 ### Then apply policy like
 ```sh
-export GM_DATABASE_TYPE=fakegres
-
-gm policy apply policy.yaml
+gm fakegres policy apply policy.yaml
 ```
 
 ### Example of role struct
@@ -83,8 +81,6 @@ gm policy apply policy.yaml
 
 ### Then apply role like
 ```sh
-export GM_DATABASE_TYPE=fakegres
-
-gm role apply role.yaml
+gm fakegres role apply role.yaml
 ```
 
