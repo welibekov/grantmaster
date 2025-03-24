@@ -51,18 +51,14 @@ _compare() {
 
   _policy apply "$input" || exit 1
   _policy get > "$current" || exit 1
+  
+  local exitcode
+  
+  if ! _equal "$input" "$current"; then
+    exitcode=1
 
- local exitcode; exitcode=0
+    diff "$input" "$current"
+  fi
 
- if ! _equal "$input" "$current"; then
-   exitcode=1
- fi
-
- if [[ $exitcode -eq 0 ]]; then
-   _done
- else
-   _failed
- fi
-
- return $exitcode
+  _exitcode "$exitcode"
 }
