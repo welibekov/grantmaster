@@ -13,7 +13,7 @@ import (
 // Apply applies the provided policies to the system by revoking existing policies
 // that are no longer applicable and granting new policies as necessary.
 func (p *PGPolicy) Apply(ctx context.Context, policies []types.Policy) error {
-	defer p.pool.Close()
+	defer p.pool.Close() // Close the connection pool when the function completes
 
 	// Retrieve existing policies from the database to compare against
 	existingPolicies, err := p.Get(ctx)
@@ -22,14 +22,17 @@ func (p *PGPolicy) Apply(ctx context.Context, policies []types.Policy) error {
 		return fmt.Errorf("couldn't apply policies: %v", err)
 	}
 
+	// Output the existing policies for debugging purposes
 	debug.OutputMarshal(existingPolicies, "existing policies")
 
 	// Determine which policies need to be revoked by comparing existing and new policies
 	revokePolicies := utils.Diff(policies, existingPolicies)
+	// Output the revoke policies for debugging purposes
 	debug.OutputMarshal(revokePolicies, "revoke policies")
 
 	// Determine which new policies need to be granted by comparing existing and new policies
 	grantPolicies := utils.Diff(existingPolicies, policies)
+	// Output the grant policies for debugging purposes
 	debug.OutputMarshal(grantPolicies, "grant policies")
 
 	// Log the count of policies identified for revocation for debugging purposes
