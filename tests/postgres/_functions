@@ -18,6 +18,10 @@ _psql() {
   _exec psql --output=/root/output -U "$POSTGRES_USER" -d "$POSTGRES_DATABASE" "$@"
 }
 
+_gm() {
+  $GM_BIN postgres "$@"
+}
+
 _msg() {
   echo -n "$*"
 }

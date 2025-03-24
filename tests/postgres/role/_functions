@@ -1,7 +1,7 @@
 #!/bin/bash
 
 _role() {
-  $GM_BIN role "$@"
+  _gm role "$@"
 }
 
 _get_role_file() {

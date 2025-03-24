@@ -17,10 +17,13 @@ import (
 
 // Initialize the command structure for roles
 func init() {
-	rootCmd.AddCommand(gmRoleCmd)        // Add the gmRoleCmd to the root command
-	gmRoleCmd.AddCommand(gmApplyRoleCmd) // Add the gmApplyRoleCmd to gmRoleCmd
-	gmRoleCmd.AddCommand(gmGetRoleCmd)   // Add the gmGetRoleCmd to gmRoleCmd
-	gmRoleCmd.AddCommand(gmEqualRoleCmd) // Add the gmEqualRoleCmd to gmRoleCmd
+	for _, gmCmd := range []*cobra.Command{gmPostgresCmd, gmFakegresCmd, gmGreenplumCmd} {
+		gmCmd.AddCommand(gmRoleCmd)
+	}
+
+	for _, roleCmd := range []*cobra.Command{gmApplyRoleCmd, gmGetRoleCmd, gmEqualRoleCmd} {
+		gmRoleCmd.AddCommand(roleCmd)
+	}
 }
 
 // Define the command for managing roles

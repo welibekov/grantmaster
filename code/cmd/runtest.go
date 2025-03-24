@@ -15,7 +15,9 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(gmRuntestCmd)
+	for _, gmCmd := range []*cobra.Command{gmPostgresCmd, gmFakegresCmd, gmGreenplumCmd} {
+		gmCmd.AddCommand(gmRuntestCmd)
+	}
 }
 
 var gmRuntestCmd = &cobra.Command{

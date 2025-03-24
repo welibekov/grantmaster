@@ -15,10 +15,13 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(gmPolicyCmd)
-	gmPolicyCmd.AddCommand(gmApplyPolicyCmd)
-	gmPolicyCmd.AddCommand(gmGetPolicyCmd)
-	gmPolicyCmd.AddCommand(gmEqualPolicyCmd)
+	for _, gmCmd := range []*cobra.Command{gmPostgresCmd, gmFakegresCmd, gmGreenplumCmd} {
+		gmCmd.AddCommand(gmPolicyCmd)
+	}
+
+	for _, policyCmd := range []*cobra.Command{gmApplyPolicyCmd, gmGetPolicyCmd, gmEqualPolicyCmd} {
+		gmPolicyCmd.AddCommand(policyCmd)
+	}
 }
 
 var gmPolicyCmd = &cobra.Command{
@@ -35,7 +38,7 @@ var gmApplyPolicyCmd = &cobra.Command{
 	Short: "Apply policies from the specified YAML file or directory",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) == 0 {
-			return fmt.Errorf("role.yaml file or directory not provided")
+			return fmt.Errorf("policy.yaml file or directory not provided")
 		}
 
 		return applyPolicy(args[0])

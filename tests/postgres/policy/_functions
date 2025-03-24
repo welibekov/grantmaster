@@ -1,7 +1,7 @@
 #!/bin/bash
 
 _policy() {
-  $GM_BIN policy "$@"
+  _gm policy "$@"
 }
 
 _get_policy_file() {
@@ -38,7 +38,7 @@ _gm_prepare_roles() {
         - create
 EOF
 
-  $GM_BIN role apply "$role_yaml" || exit 1
+  $GM_BIN postgres role apply "$role_yaml" || exit 1
 }
 
 _equal() {

@@ -6,6 +6,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/welibekov/grantmaster/modules/config"
 )
 
 func init() {
@@ -20,6 +21,10 @@ var rootCmd = &cobra.Command{
 		level, err := cmd.Flags().GetString("loglevel")
 		if err != nil {
 			return err
+		}
+
+		if len(os.Args) > 2 { // set GM_DATABASE_TYPE based on caller command.
+			os.Setenv(config.DatabaseType, os.Args[1])
 		}
 
 		return setLogLevel(level)
