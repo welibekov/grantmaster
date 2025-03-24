@@ -81,3 +81,14 @@ _load_and_run_tests() {
   return $exitcode
 }
 
+_exitcode() {
+  local exitcode; exitcode=$1
+
+  if [[ $exitcode -eq 0 ]]; then
+    _done
+  else
+    _failed
+  fi
+
+  return $exitcode
+}
