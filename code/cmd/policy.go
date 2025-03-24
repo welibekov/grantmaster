@@ -15,10 +15,13 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(gmPolicyCmd)
-	gmPolicyCmd.AddCommand(gmApplyPolicyCmd)
-	gmPolicyCmd.AddCommand(gmGetPolicyCmd)
-	gmPolicyCmd.AddCommand(gmEqualPolicyCmd)
+	for _, gmCmd := range []*cobra.Command{gmPostgresCmd, gmFakegresCmd, gmGreenplumCmd} {
+		gmCmd.AddCommand(gmPolicyCmd)
+	}
+
+	for _, policyCmd := range []*cobra.Command{gmApplyPolicyCmd, gmGetPolicyCmd, gmEqualPolicyCmd} {
+		gmPolicyCmd.AddCommand(policyCmd)
+	}
 }
 
 var gmPolicyCmd = &cobra.Command{

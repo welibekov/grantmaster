@@ -9,6 +9,8 @@ var (
 	Fakegres  DatabaseType = "fakegres"  // Fakegres is a constant for a mocked or fake database type.
 )
 
+var Databases = []DatabaseType{Postgres, Greenplum, Fakegres}
+
 func (d DatabaseType) ToString() string {
 	return string(d)
 }
