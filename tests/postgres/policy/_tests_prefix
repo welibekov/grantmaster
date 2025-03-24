@@ -24,7 +24,9 @@ EOF
   _policy apply "$policy_yaml" || exit 1
   GM_DATABASE_ROLE_PREFIX='meddle\_' _policy get > "$get_policy_yaml" || exit 1
 
-  echo '[]' > "$get_policy_prefix_yaml"
+  cat <<'EOF' >"$get_policy_prefix_yaml"
+[]
+EOF
 
   _equal "$get_policy_yaml" "$get_policy_prefix_yaml"
 
