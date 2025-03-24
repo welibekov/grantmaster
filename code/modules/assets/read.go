@@ -21,6 +21,7 @@ func ReadAssets[T any](assetPath string) ([]T, error) {
 	// Read assets from all YAML files in the specified directory
 	return readAssetFromDirectory(assetPath,
 		func(path string) ([]T, error) {
+			// Apply the assetFunc to read each YAML file
 			return readAsset[[]T](path)
 		})
 }
@@ -28,22 +29,25 @@ func ReadAssets[T any](assetPath string) ([]T, error) {
 // ReadAssetsFromDirectory reads assets from all files in a directory using
 // the provided assetFunc to handle each file.
 func ReadAssetsFromDirectory[T any](assetPath string, assetFunc func(string) ([]T, error)) ([]T, error) {
+	// Delegate to readAssetFromDirectory with the provided assetFunc
 	return readAssetFromDirectory[T](assetPath, assetFunc)
 }
 
-// ReadPolicy reads a single asset from the given file path and returns it as type T.
+// ReadAsset reads a single asset from the given file path and returns it as type T.
 func ReadAsset[T any](path string) (T, error) {
+	// Delegate to readAsset for reading the asset
 	return readAsset[T](path)
 }
 
-// readFromDirectory walks through the specified directory, applying assetFunc to read
-// each YAML file and collecting the resulting assets.
+// readAssetFromDirectory walks through the specified directory, applying assetFunc 
+// to read each YAML file and collecting the resulting assets.
 func readAssetFromDirectory[T any](
 	assetPath string,
 	assetFunc func(string) ([]T, error),
 ) ([]T, error) {
 	var assets []T
 
+	// Walk through the directory to process each file
 	err := filepath.Walk(assetPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			// Wrap the error with additional context
@@ -73,7 +77,8 @@ func readAssetFromDirectory[T any](
 	return assets, nil
 }
 
-// readAsset reads the file at the given path and unmarshals its YAML content into the provided type T.
+// readAsset reads the file at the given path and unmarshals its YAML content
+// into the provided type T.
 func readAsset[T any](path string) (T, error) {
 	var data T
 

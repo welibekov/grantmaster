@@ -23,15 +23,16 @@ type FGPolicy struct {
 func New(cfg map[string]string) (*FGPolicy, error) {
 	// Create a new instance of FGPolicy and initialize its fields.
 	fgPol := &FGPolicy{
-		Policy: base.NewPolicy(cfg), // Create a new base policy
+		Policy: base.NewPolicy(cfg), // Create a new base policy using the configuration
 
 		// Retrieve the root directory from the configuration or set a default.
-		rootDir:   utils.GetRootDir(cfg), // Get the root directory
+		rootDir:   utils.GetRootDir(cfg), // Get the root directory from the config
 		policyDir: filepath.Join(utils.GetRootDir(cfg), "policy"), // Full path to the policy directory.
 	}
 
-	// Check if the specified policy directory exists and create it if it doesn't.
+	// Check if the specified policy directory exists; create it if it doesn't.
 	if err := assets.CreateDir(fgPol.policyDir); err != nil {
+		// Return an error if directory creation fails, including the directory path and the error.
 		return nil, fmt.Errorf("couldn't create directory %s: %v", fgPol.policyDir, err)
 	}
 

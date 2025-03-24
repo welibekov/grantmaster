@@ -6,9 +6,17 @@ import (
 	"github.com/welibekov/grantmaster/modules/policy/types"
 )
 
+// Policier defines the interface for managing policies in the system.
 type Policier interface {
-	Apply(context.Context, []types.Policy) error
-	Grant(context.Context, []types.Policy) error
-	Revoke(context.Context, []types.Policy) error
-	Get(context.Context) ([]types.Policy, error)
+	// Apply applies a set of policies and returns an error if the operation fails.
+	Apply(ctx context.Context, policies []types.Policy) error
+	
+	// Grant grants a set of policies and returns an error if the operation fails.
+	Grant(ctx context.Context, policies []types.Policy) error
+	
+	// Revoke revokes a set of policies and returns an error if the operation fails.
+	Revoke(ctx context.Context, policies []types.Policy) error
+	
+	// Get retrieves the current policies and returns them along with an error if the operation fails.
+	Get(ctx context.Context) ([]types.Policy, error)
 }

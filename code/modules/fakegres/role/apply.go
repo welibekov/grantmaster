@@ -17,6 +17,7 @@ func (f *FGRole) Apply(_ context.Context, roles []types.Role) error {
 	// Retrieve existing roles from the storage.
 	existingRoles, err := f.Get(context.Background())
 	if err != nil {
+		// Return an error if retrieval of existing roles fails.
 		return fmt.Errorf("couldn't get existing roles: %v", err)
 	}
 	debug.OutputMarshal(existingRoles, "existing roles")
@@ -26,26 +27,30 @@ func (f *FGRole) Apply(_ context.Context, roles []types.Role) error {
 	debug.OutputMarshal(revokeRoles, "revoke roles")
 	debug.OutputMarshal(roles, "apply roles")
 
-	// Remove revoked roles from the storage.
+	// Remove revoked roles from the storage using a helper function.
 	err = fgUtils.Remove[types.Role](revokeRoles,
 		func(item types.Role) string {
+			// Construct the file path for the role to be removed from storage.
 			return filepath.Join(f.roleDir, item.Name)
 		})
 
 	if err != nil {
+		// Return an error if removal of roles fails.
 		return fmt.Errorf("couldn't remove roles: %v", err)
 	}
 
-	// Save the updated list of roles to the storage.
+	// Save the updated list of roles to the storage using a helper function.
 	err = fgUtils.Save(roles,
 		func(item types.Role) string {
+			// Construct the file path for the role to be saved in storage.
 			return filepath.Join(f.roleDir, item.Name)
 		})
 
 	if err != nil {
+		// Return an error if saving of roles fails.
 		return fmt.Errorf("couldn't save roles: %v", err)
 	}
 
-	// Successfully applied the roles.
+	// Successfully applied the roles; return nil indicating no error occurred.
 	return nil
 }

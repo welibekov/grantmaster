@@ -12,18 +12,20 @@ func DetectDuplicated[T any](items []T, keyExtractor func(T) string) error {
 
 	// Iterate over each item in the provided slice.
 	for _, item := range items {
+		// Extract the key for the current item using the provided keyExtractor function.
 		key := keyExtractor(item)
-		// Check if the key of the current item already exists in the map.
+
+		// Check if the current item's key already exists in the keysMap.
 		_, found := keysMap[key]
 		if found {
-			// If the item is found, return an error indicating a duplicate.
+			// If the key is found, return an error indicating a duplicate entry.
 			return fmt.Errorf("duplicated entry for '%s'", key)
 		}
 
-		// If the key is not found, add it to the map.
+		// If the key is not found, add it to keysMap to track its occurrence.
 		keysMap[key] = struct{}{}
 	}
 
-	// If no duplicates were found, return nil indicating success.
+	// If no duplicates were found after processing all items, return nil indicating success.
 	return nil
 }

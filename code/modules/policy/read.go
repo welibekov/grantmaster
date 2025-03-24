@@ -11,12 +11,13 @@ import (
 	"github.com/welibekov/grantmaster/modules/utils"
 )
 
-// ReadPolicies reads policies from the specified path. If the path is a file and is
-// a YAML file, it reads the policy directly. Otherwise, it attempts to read policies
-// from all YAML files within a directory.
+// ReadPolicies reads policies from the given path. If the path points to a single YAML file,
+// it reads the policy directly from that file. If the path is a directory, it reads policies
+// from all YAML files within the directory.
 func ReadPolicies(policyPath string) ([]types.Policy, error) {
+	// Check if the path is a file and if it's a YAML file
 	if utils.IsItFile(policyPath) && utils.IsItYAML(policyPath) {
-		// Read a single policy from a YAML file
+		// Read a single policy from the specified YAML file
 		return readPolicyGen[[]types.Policy](policyPath)
 	}
 
@@ -27,40 +28,44 @@ func ReadPolicies(policyPath string) ([]types.Policy, error) {
 		})
 }
 
-// ReadPoliciesFromDirectory reads policies from all files in a directory using
-// the provided policyFunc to handle each file.
+// ReadPoliciesFromDirectory reads policies from all files in the specified directory
+// using the provided policyFunc to handle each file.
 func ReadPoliciesFromDirectory(policyPath string, policyFunc func(string) ([]types.Policy, error)) ([]types.Policy, error) {
+	// Reuse the internal function to read policies from a directory
 	return readPoliciesFromDirectory(policyPath, policyFunc)
 }
 
 // ReadPolicy reads a single policy from the given file path and returns it as type T.
 func ReadPolicy[T any](path string) (T, error) {
+	// Read a policy from the specified path using a generic read function
 	return readPolicyGen[T](path)
 }
 
-// readPoliciesFromDirectory walks through the specified directory, applying policyFunc to read
-// each YAML file and collecting the resulting policies.
+// readPoliciesFromDirectory recursively walks through the specified directory,
+// applying policyFunc to read each YAML file and collecting the resulting policies into a slice.
 func readPoliciesFromDirectory(
 	policyPath string,
 	policyFunc func(string) ([]types.Policy, error),
 ) ([]types.Policy, error) {
 	var policies []types.Policy
 
+	// Walk the directory and process files
 	err := filepath.Walk(policyPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			// Wrap the error with additional context
+			// Wrap the error with additional context about the path
 			return fmt.Errorf("error accessing the path %q: %w", path, err)
 		}
 
-		// Check if the file has a .yaml or .yml extension
+		// Check if the current item is a file and has a YAML extension
 		if !info.IsDir() && utils.IsItYAML(path) {
+			// Call the provided function to read the policy
 			policy, err := policyFunc(path)
 			if err != nil {
-				// Wrap the error with context indicating which file failed
+				// Wrap the error indicating which file failed to read
 				return fmt.Errorf("could not read policy from file %q: %v", path, err)
 			}
 
-			// Add the retrieved policies to the slice
+			// Append the retrieved policies to the slice
 			policies = append(policies, policy...)
 		}
 
@@ -68,7 +73,7 @@ func readPoliciesFromDirectory(
 	})
 
 	if err != nil {
-		// Wrap the error indicating there was a problem walking the directory
+		// Wrap the error indicating a problem occurred while walking the directory
 		return policies, fmt.Errorf("error walking the path %q: %w", policyPath, err)
 	}
 
@@ -79,16 +84,16 @@ func readPoliciesFromDirectory(
 func readPolicyGen[T any](path string) (T, error) {
 	var policy T
 
-	// Read the file contents
+	// Read the file contents into memory
 	file, err := os.ReadFile(path)
 	if err != nil {
-		// Wrap the error to provide context
+		// Wrap the error to provide context about the file that could not be read
 		return policy, fmt.Errorf("could not read file %q: %v", path, err)
 	}
 
 	// Unmarshal the YAML file content into the specified type
 	if err := yaml.Unmarshal(file, &policy); err != nil {
-		// Wrap the unmarshalling error with context
+		// Wrap the unmarshalling error with context about the file
 		return policy, fmt.Errorf("could not unmarshal YAML from file %q: %v", path, err)
 	}
 

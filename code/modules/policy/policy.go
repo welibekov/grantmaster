@@ -12,16 +12,19 @@ import (
 	"github.com/welibekov/grantmaster/modules/types"
 )
 
+// New creates a new Policier based on the specified database type in the configuration.
+// It takes a context and a configuration map as input and returns a Policier interface or an error.
 func New(ctx context.Context, cfg map[string]string) (databaser.Policier, error) {
+	// Retrieve the database type from the configuration
 	switch types.DatabaseType(cfg[config.DatabaseType]) {
 	case types.Postgres:
-		// Initialize Postgres database
+		// Initialize and return a new Postgres Policier
 		return pgPol.New(ctx, cfg)
 	case types.Fakegres:
-		// Initialize Fakegres database
+		// Initialize and return a new Fakegres Policier
 		return fgPol.New(cfg)
-	// Initialize Greenplum database
 	case types.Greenplum:
+		// Initialize and return a new Greenplum Policier
 		return gpPol.New(ctx, cfg)
 	default:
 		// Return an error if the database type is not recognized

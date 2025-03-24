@@ -21,7 +21,7 @@ func DetectDuplicated(roles []types.Role) error {
 			return fmt.Errorf("duplicated role for '%s' user", role.Name)
 		}
 
-		// If the user is not found, add it to the map.
+		// If the user is not found, add it to the map for tracking.
 		rolesMap[role.Name] = struct{}{}
 	}
 

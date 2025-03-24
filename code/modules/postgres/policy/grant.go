@@ -9,7 +9,9 @@ import (
 	"github.com/welibekov/grantmaster/modules/policy/types"
 )
 
-// Grant takes a context and a slice of policies, and attempts to grant specified roles to users
+// Grant takes a context and a slice of policies, and attempts to grant specified roles to users.
+// It iterates over each policy, generating and executing SQL grant queries for the roles defined in each policy.
+// If any error occurs during the execution, it returns a wrapped error providing context about the failed operation.
 func (p *PGPolicy) Grant(ctx context.Context, policies []types.Policy) error {
 	// Iterate over each policy in the provided slice
 	for _, policy := range policies {
@@ -34,7 +36,8 @@ func (p *PGPolicy) Grant(ctx context.Context, policies []types.Policy) error {
 	return nil
 }
 
-// grantQuery constructs the SQL query string for granting roles to a user
+// grantQuery constructs the SQL query string for granting roles to a user.
+// It takes a policy as input, formats the GRANT statement and returns it as a string.
 func (p *PGPolicy) grantQuery(policy types.Policy) string {
 	// Join the roles with a comma and format the SQL grant statement
 	return fmt.Sprintf(`GRANT %s TO %s;`, strings.Join(policy.Roles, ","), policy.Username)

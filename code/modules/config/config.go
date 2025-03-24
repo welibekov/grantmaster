@@ -33,7 +33,9 @@ func Load() map[string]string {
 		config[DatabaseRolePrefix] = DefaultDatabaseRolePrefix
 	}
 
+	// Check if the run test cleanup flag exists in the config
 	_, found = config[RuntestCleanup]
+	// If not found, set it to a default value
 	if !found {
 		config[RuntestCleanup] = DefaultRuntestCleanup
 	}

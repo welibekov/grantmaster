@@ -19,5 +19,5 @@ func In[T comparable](what T, where []T) bool {
 	}
 
 	// If we finish the loop without finding a match, return false
-	return false
+	return false // Element not found in the slice
 }
