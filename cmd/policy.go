@@ -26,7 +26,7 @@ func init() {
 
 var gmPolicyCmd = &cobra.Command{
 	Use:   "policy",
-	Short: "Maniulate database policies",
+	Short: "Manipulate database policies",
 	Run: func(cmd *cobra.Command, args []string) {
 		cmd.Help()
 		os.Exit(1)
