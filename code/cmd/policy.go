@@ -6,11 +6,11 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/welibekov/grantmaster/modules/assets"
-	"github.com/welibekov/grantmaster/modules/config"
-	"github.com/welibekov/grantmaster/modules/policy"
-	"github.com/welibekov/grantmaster/modules/policy/types"
-	"github.com/welibekov/grantmaster/modules/policy/utils"
+	"github.com/welibekov/grantmaster/internal/assets"
+	"github.com/welibekov/grantmaster/internal/config"
+	"github.com/welibekov/grantmaster/internal/policy"
+	"github.com/welibekov/grantmaster/internal/policy/types"
+	"github.com/welibekov/grantmaster/internal/policy/utils"
 	"gopkg.in/yaml.v3"
 )
 

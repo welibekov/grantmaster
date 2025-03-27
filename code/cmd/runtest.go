@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/welibekov/grantmaster/modules/config"
-	"github.com/welibekov/grantmaster/modules/runtest"
-	"github.com/welibekov/grantmaster/modules/types"
+	"github.com/welibekov/grantmaster/internal/config"
+	"github.com/welibekov/grantmaster/internal/runtest"
+	"github.com/welibekov/grantmaster/internal/types"
 
 	"github.com/spf13/cobra"
 )

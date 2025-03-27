@@ -6,7 +6,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/welibekov/grantmaster/modules/config"
+	"github.com/welibekov/grantmaster/internal/config"
 )
 
 func init() {
