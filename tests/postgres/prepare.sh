@@ -56,6 +56,11 @@ services:
       - "5432:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
 
 volumes:
   pg_data:
@@ -74,18 +79,33 @@ _wait() {
   local cont_status
   local max; max=10
 
-  local attempt; attempt=0
+  _msg "Waiting for $POSTGRES_DOCKER_CONTAINER will running and become ready"
 
+  local attempt; attempt=0
   while [[ $cont_status != "running" ]]; do
     cont_status=$(docker inspect "$POSTGRES_DOCKER_CONTAINER" | jq -r '.[].State.Status')
     ((attempt++))
 
     if [[ $attempt -gt $max ]]; then
-      _fatal "maximum attepmt exceeded"
+      _fatal "maximum attempt exceeded"
     fi
 
     sleep 2
   done
+
+  _msg "Waiting for $POSTGRES_DATABASE database become ready and accepts connections"
+
+  attempt=0
+  while ! docker exec -ti "$POSTGRES_DOCKER_CONTAINER" /usr/bin/pg_isready -q; do
+    ((attempt++))
+    if [[ $attempt -gt $max ]]; then
+      _fatal "maximum attempt exceeded"
+    fi
+    
+    sleep 2
+  done
+
+  sleep 0.5 ## last shield
 }
 
 _prepare_schemas() {
@@ -110,7 +130,7 @@ _prepare_users() {
   )
   
   for user in "${users[@]}"; do
-    _psql -c "CREATE USER "$user" WITH PASSWORD '$user';"
+    _psql -c "CREATE USER $user WITH PASSWORD '$user';"
   done
 }
 
