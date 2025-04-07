@@ -40,6 +40,12 @@ make
 make runtest
 ```
 
+Or for specific postgres version
+
+```sh
+POSTGRES_DOCKER_IMAGE=postgres:14 make runtest
+```
+
 ### Example of policy struct
 
 ```yaml
@@ -84,3 +90,16 @@ gm fakegres policy apply policy.yaml
 gm fakegres role apply role.yaml
 ```
 
+
+### Supported postgres versions
+```
+Postgres:9
+Postgres:10
+Postgres:11
+Postgres:12
+Postgres:13
+Postgres:14
+Postgres:15
+Postgres:16
+Postgres:17
+```
