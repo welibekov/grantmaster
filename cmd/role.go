@@ -15,15 +15,24 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var roleFlags = struct {
+	getAll bool // Flag to indicate if all roles should be retrieved.
+}{}
+
 // init sets up the command structure for managing roles by adding the role command to multiple commands.
 func init() {
+	// Iterate over predefined commands and add the role command to each.
 	for _, gmCmd := range []*cobra.Command{gmPostgresCmd, gmFakegresCmd, gmGreenplumCmd} {
 		gmCmd.AddCommand(gmRoleCmd) // Add the role command to each of the specified commands.
 	}
 
+	// Add specific role subcommands to the main role command.
 	for _, roleCmd := range []*cobra.Command{gmApplyRoleCmd, gmGetRoleCmd, gmEqualRoleCmd} {
 		gmRoleCmd.AddCommand(roleCmd) // Add subcommands to the gmRoleCmd.
 	}
+
+	// Define a persistent flag for retrieving all roles.
+	gmGetRoleCmd.PersistentFlags().BoolVar(&roleFlags.getAll, "all", false, "Get all existing roles")
 }
 
 // gmRoleCmd defines the command for managing database roles.
@@ -47,7 +56,7 @@ var gmApplyRoleCmd = &cobra.Command{
 		}
 
 		// Call applyRole function to apply the roles defined in the first argument.
-		return applyRole(args[0]) 
+		return applyRole(args[0])
 	},
 }
 
@@ -72,7 +81,7 @@ func applyRole(roleFile string) error {
 
 	// Validate role names against the specified prefix criteria from the configuration.
 	if err := utils.CheckPrefix(roles, cfg[config.DatabaseRolePrefix]); err != nil {
-		return fmt.Errorf("some role names do not satisfy GM_ROLE_PREFIX criteria: %v", err) // Return error if prefix check fails.
+		return fmt.Errorf("some role names do not satisfy %s criteria: %v", config.DatabaseRolePrefix, err) // Return error if prefix check fails.
 	}
 
 	// Create an instance of the database object.
@@ -82,7 +91,7 @@ func applyRole(roleFile string) error {
 	}
 
 	// Apply the roles to the database.
-	return databaseInstance.Apply(ctx, roles) 
+	return databaseInstance.Apply(ctx, roles) // Return any error occurred during the application of roles.
 }
 
 // gmGetRoleCmd defines the command to get existing roles from the database.
@@ -93,8 +102,16 @@ var gmGetRoleCmd = &cobra.Command{
 		// Create a background context for database operations.
 		ctx := context.Background()
 
+		// Load configuration from environment variables.
+		cfg := config.Load()
+
+		// Adjust the role prefix in the configuration if the "get all" flag is set.
+		if roleFlags.getAll {
+			cfg[config.DatabaseRolePrefix] = "_" // by SQL definition "_" applies all values.
+		}
+
 		// Create an instance of the database object.
-		databaseInstance, err := role.New(ctx, config.Load())
+		databaseInstance, err := role.New(ctx, cfg)
 		if err != nil {
 			return fmt.Errorf("failed to create database instance: %w", err) // Return error if database instance creation fails.
 		}
@@ -120,7 +137,7 @@ var gmGetRoleCmd = &cobra.Command{
 
 // gmEqualRoleCmd defines the command to compute the difference between two sets of roles.
 var gmEqualRoleCmd = &cobra.Command{
-	Use:   "equal",                   // Command usage.
+	Use:   "equal",                    // Command usage.
 	Short: "Find two roles' equality", // Short description of command functionality.
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// Ensure exactly two arguments are provided.

@@ -73,7 +73,7 @@ func applyPolicy(policyFile string) error {
 
 	// Validate role names against database role prefix criteria.
 	if err := utils.CheckPrefix(policies, cfg[config.DatabaseRolePrefix]); err != nil {
-		return fmt.Errorf("some role names do not satisfy GM_ROLE_PREFIX criteria: %v", err)
+		return fmt.Errorf("some role names do not satisfy %s criteria: %v", config.DatabaseRolePrefix, err)
 	}
 
 	// Create a new instance of the database with the provided configuration.
